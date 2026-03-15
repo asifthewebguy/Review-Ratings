@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { SearchBar } from '@/components/search-bar';
 import { CategoryGrid } from '@/components/category-grid';
+import { BusinessCard } from '@/components/business-card';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
@@ -8,6 +9,19 @@ async function getCategories() {
   try {
     const res = await fetch(`${API_URL}/categories`, {
       next: { revalidate: 3600 }, // Cache for 1 hour
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+async function getTopRated() {
+  try {
+    const res = await fetch(`${API_URL}/businesses?sort=rating&limit=6`, {
+      next: { revalidate: 3600 },
     });
     if (!res.ok) return [];
     const data = await res.json();
@@ -25,7 +39,7 @@ export default async function HomePage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'home' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
-  const categories = await getCategories();
+  const [categories, topRated] = await Promise.all([getCategories(), getTopRated()]);
 
   return (
     <div className="flex flex-col">
@@ -49,6 +63,21 @@ export default async function HomePage({
         <div className="mx-auto max-w-7xl">
           <h2 className="text-2xl font-bold text-center mb-10">{t('browseCategories')}</h2>
           <CategoryGrid categories={categories} locale={locale} />
+        </div>
+      </section>
+
+      {/* Top Rated Section */}
+      <section className="py-16 px-4 bg-muted/30">
+        <div className="mx-auto max-w-7xl">
+          <h2 className="text-2xl font-bold mb-8">{t('topRated')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {topRated.map((business: any) => (
+              <BusinessCard key={business.id} business={business} locale={locale} />
+            ))}
+          </div>
+          {topRated.length === 0 && (
+            <p className="text-center text-muted-foreground py-8">{t('noBusinesses')}</p>
+          )}
         </div>
       </section>
     </div>

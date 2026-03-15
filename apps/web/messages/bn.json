@@ -44,9 +44,10 @@
   "home": {
     "heroTitle": "বিশ্বস্ত রিভিউ, সৎ মতামত",
     "heroSubtitle": "বাংলাদেশের ব্যবসা ও সেবা সম্পর্কে সত্যিকারের রিভিউ পড়ুন এবং লিখুন",
-    "topRated": "সর্বোচ্চ রেটিং",
+    "topRated": "শীর্ষ রেটিং প্রাপ্ত",
     "recentReviews": "সাম্প্রতিক রিভিউ",
-    "browseCategories": "ক্যাটেগরি ব্রাউজ করুন"
+    "browseCategories": "ক্যাটেগরি ব্রাউজ করুন",
+    "noBusinesses": "এখনো কোনো ব্যবসা নেই"
   },
   "business": {
     "claimed": "দাবিকৃত ও যাচাইকৃত",
@@ -54,7 +55,46 @@
     "unclaimed": "দাবি করা হয়নি",
     "claimBusiness": "এই ব্যবসা দাবি করুন",
     "businessResponse": "ব্যবসার প্রতিক্রিয়া",
-    "reportReview": "রিভিউ রিপোর্ট করুন"
+    "reportReview": "রিভিউ রিপোর্ট করুন",
+    "reviews": "রিভিউ",
+    "writeReview": "রিভিউ লিখুন",
+    "website": "ওয়েবসাইট",
+    "phone": "ফোন",
+    "address": "ঠিকানা",
+    "noReviews": "এখনো কোনো রিভিউ নেই",
+    "beFirst": "প্রথম রিভিউ দিন",
+    "ratingDistribution": "রেটিং বিতরণ",
+    "editedReview": "সম্পাদিত",
+    "verifiedPurchase": "যাচাইকৃত ক্রয়",
+    "flagReview": "রিপোর্ট করুন",
+    "helpful": "সহায়ক"
+  },
+  "search": {
+    "title": "অনুসন্ধান ফলাফল",
+    "placeholder": "ব্যবসা খুঁজুন...",
+    "noResults": "কোনো ফলাফল পাওয়া যায়নি",
+    "filters": "ফিল্টার",
+    "sortBy": "সাজানো",
+    "sortRelevance": "প্রাসঙ্গিকতা",
+    "sortRating": "রেটিং",
+    "sortReviews": "রিভিউ সংখ্যা",
+    "minRating": "ন্যূনতম রেটিং",
+    "category": "বিভাগ",
+    "location": "অবস্থান",
+    "allCategories": "সব বিভাগ",
+    "allLocations": "সব অবস্থান"
+  },
+  "review": {
+    "title": "রিভিউ লিখুন",
+    "rating": "রেটিং",
+    "ratingRequired": "রেটিং দিন",
+    "body": "আপনার অভিজ্ঞতা লিখুন",
+    "bodyPlaceholder": "আপনার অভিজ্ঞতা বিস্তারিত লিখুন (২০-১০০০ অক্ষর)",
+    "submit": "জমা দিন",
+    "submitting": "জমা হচ্ছে...",
+    "success": "রিভিউ সফলভাবে জমা হয়েছে",
+    "loginRequired": "রিভিউ দিতে লগইন করুন",
+    "alreadyReviewed": "আপনি ইতিমধ্যে এই ব্যবসার রিভিউ দিয়েছেন"
   },
   "footer": {
     "about": "আমাদের সম্পর্কে",

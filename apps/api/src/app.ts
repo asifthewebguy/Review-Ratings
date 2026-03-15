@@ -5,11 +5,15 @@ import rateLimit from '@fastify/rate-limit';
 import { prismaPlugin } from './plugins/prisma.js';
 import { redisPlugin } from './plugins/redis.js';
 import { jwtPlugin } from './plugins/jwt.js';
+import meiliSearchPlugin from './plugins/meilisearch.js';
 import { healthRoutes } from './routes/health.js';
 import { authRoutes } from './routes/auth/index.js';
 import { locationRoutes } from './routes/locations/index.js';
 import { categoryRoutes } from './routes/categories/index.js';
 import { userRoutes } from './routes/users/index.js';
+import { businessRoutes } from './routes/businesses/index.js';
+import { reviewRoutes } from './routes/reviews/index.js';
+import { searchRoutes } from './routes/search/index.js';
 
 export async function buildApp() {
   const app = Fastify({
@@ -41,6 +45,7 @@ export async function buildApp() {
   await app.register(prismaPlugin);
   await app.register(redisPlugin);
   await app.register(jwtPlugin);
+  await app.register(meiliSearchPlugin);
 
   // ── Routes ─────────────────────────────────────────────
   await app.register(healthRoutes, { prefix: '/api/v1' });
@@ -48,6 +53,9 @@ export async function buildApp() {
   await app.register(locationRoutes, { prefix: '/api/v1/locations' });
   await app.register(categoryRoutes, { prefix: '/api/v1/categories' });
   await app.register(userRoutes, { prefix: '/api/v1/users' });
+  await app.register(businessRoutes, { prefix: '/api/v1/businesses' });
+  await app.register(reviewRoutes, { prefix: '/api/v1/reviews' });
+  await app.register(searchRoutes, { prefix: '/api/v1/search' });
 
   return app;
 }

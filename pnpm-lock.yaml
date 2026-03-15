@@ -53,6 +53,9 @@ importers:
       ioredis:
         specifier: ^5.4.2
         version: 5.10.0
+      meilisearch:
+        specifier: ^0.47.0
+        version: 0.47.0
       pino-pretty:
         specifier: ^13.0.0
         version: 13.1.3
@@ -96,6 +99,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       lucide-react:
         specifier: ^0.481.0
         version: 0.481.0(react@19.2.4)
@@ -1400,6 +1406,9 @@ packages:
     resolution: {integrity: sha512-ndfJ/JxxMd3nw31uyKoY2naivF+r29V+Lc0svZxe1JvvIRmi8hUsrMvdOwgS1o6uBHmiz91geQ0ylPP0aj1VUA==}
     engines: {node: '>=12'}
 
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
+
   dateformat@4.6.3:
     resolution: {integrity: sha512-2P0p0pFGzHS5EMnhdxQi7aJN+iMheud0UhG4dlE1DLAlvL8JHjJJTX/CSm4JXwV0Ka5nGk3zC5mcb5bUQUxxMA==}
 
@@ -1753,6 +1762,9 @@ packages:
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
+
+  meilisearch@0.47.0:
+    resolution: {integrity: sha512-Qq+hatuDJ0z5c+szVb0O/uI7Z2jfMUjj8eNB6xPyKp9Og7GVnrOZJRVoDPqGoVY484Iwh+F61y2UreIetda00w==}
 
   minimalistic-assert@1.0.1:
     resolution: {integrity: sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A==}
@@ -3334,6 +3346,8 @@ snapshots:
 
   d3-timer@3.0.1: {}
 
+  date-fns@4.1.0: {}
+
   dateformat@4.6.3: {}
 
   debug@4.4.3:
@@ -3687,6 +3701,8 @@ snapshots:
   magic-string@0.30.21:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  meilisearch@0.47.0: {}
 
   minimalistic-assert@1.0.1: {}
 

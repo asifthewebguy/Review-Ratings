@@ -46,7 +46,8 @@
     "heroSubtitle": "Read and write genuine reviews about businesses and services in Bangladesh",
     "topRated": "Top Rated",
     "recentReviews": "Recent Reviews",
-    "browseCategories": "Browse Categories"
+    "browseCategories": "Browse Categories",
+    "noBusinesses": "No businesses yet"
   },
   "business": {
     "claimed": "Claimed & Verified",
@@ -54,7 +55,46 @@
     "unclaimed": "Unclaimed",
     "claimBusiness": "Claim this business",
     "businessResponse": "Business Response",
-    "reportReview": "Report Review"
+    "reportReview": "Report Review",
+    "reviews": "Reviews",
+    "writeReview": "Write a Review",
+    "website": "Website",
+    "phone": "Phone",
+    "address": "Address",
+    "noReviews": "No reviews yet",
+    "beFirst": "Be the first to review",
+    "ratingDistribution": "Rating Distribution",
+    "editedReview": "Edited",
+    "verifiedPurchase": "Verified Purchase",
+    "flagReview": "Report",
+    "helpful": "Helpful"
+  },
+  "search": {
+    "title": "Search Results",
+    "placeholder": "Search businesses...",
+    "noResults": "No results found",
+    "filters": "Filters",
+    "sortBy": "Sort by",
+    "sortRelevance": "Relevance",
+    "sortRating": "Rating",
+    "sortReviews": "Most Reviews",
+    "minRating": "Min Rating",
+    "category": "Category",
+    "location": "Location",
+    "allCategories": "All Categories",
+    "allLocations": "All Locations"
+  },
+  "review": {
+    "title": "Write a Review",
+    "rating": "Rating",
+    "ratingRequired": "Please select a rating",
+    "body": "Your Experience",
+    "bodyPlaceholder": "Describe your experience in detail (20-1000 characters)",
+    "submit": "Submit Review",
+    "submitting": "Submitting...",
+    "success": "Review submitted successfully",
+    "loginRequired": "Please login to write a review",
+    "alreadyReviewed": "You have already reviewed this business"
   },
   "footer": {
     "about": "About Us",
