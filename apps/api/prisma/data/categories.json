@@ -1,0 +1,126 @@
+[
+  {
+    "nameEn": "E-Commerce & Online Shops",
+    "nameBn": "ই-কমার্স ও অনলাইন শপ",
+    "slug": "ecommerce",
+    "icon": "🛒",
+    "sortOrder": 1,
+    "subRatings": [
+      { "key": "product_accuracy", "labelEn": "Product Accuracy", "labelBn": "পণ্যের নির্ভুলতা", "sortOrder": 1 },
+      { "key": "delivery_speed", "labelEn": "Delivery Speed", "labelBn": "ডেলিভারি গতি", "sortOrder": 2 },
+      { "key": "packaging_quality", "labelEn": "Packaging Quality", "labelBn": "প্যাকেজিং মান", "sortOrder": 3 },
+      { "key": "customer_service", "labelEn": "Customer Service", "labelBn": "গ্রাহক সেবা", "sortOrder": 4 },
+      { "key": "return_refund", "labelEn": "Return / Refund", "labelBn": "রিটার্ন / রিফান্ড", "sortOrder": 5 }
+    ]
+  },
+  {
+    "nameEn": "F-Commerce (Facebook/Instagram Sellers)",
+    "nameBn": "এফ-কমার্স (ফেসবুক/ইনস্টাগ্রাম বিক্রেতা)",
+    "slug": "fcommerce",
+    "icon": "📱",
+    "sortOrder": 2,
+    "subRatings": [
+      { "key": "product_accuracy", "labelEn": "Product Accuracy", "labelBn": "পণ্যের নির্ভুলতা", "sortOrder": 1 },
+      { "key": "delivery_speed", "labelEn": "Delivery Speed", "labelBn": "ডেলিভারি গতি", "sortOrder": 2 },
+      { "key": "packaging_quality", "labelEn": "Packaging Quality", "labelBn": "প্যাকেজিং মান", "sortOrder": 3 },
+      { "key": "customer_service", "labelEn": "Customer Service", "labelBn": "গ্রাহক সেবা", "sortOrder": 4 },
+      { "key": "return_refund", "labelEn": "Return / Refund", "labelBn": "রিটার্ন / রিফান্ড", "sortOrder": 5 }
+    ]
+  },
+  {
+    "nameEn": "Restaurants & Cafes",
+    "nameBn": "রেস্তোরাঁ ও ক্যাফে",
+    "slug": "restaurants",
+    "icon": "🍽️",
+    "sortOrder": 3,
+    "subRatings": [
+      { "key": "food_quality", "labelEn": "Food Quality", "labelBn": "খাবারের মান", "sortOrder": 1 },
+      { "key": "value_for_money", "labelEn": "Value for Money", "labelBn": "মূল্য অনুপাত", "sortOrder": 2 },
+      { "key": "delivery_speed", "labelEn": "Delivery Speed", "labelBn": "ডেলিভারি গতি", "sortOrder": 3 },
+      { "key": "hygiene", "labelEn": "Hygiene", "labelBn": "পরিচ্ছন্নতা", "sortOrder": 4 },
+      { "key": "staff_behavior", "labelEn": "Staff Behavior", "labelBn": "কর্মীর আচরণ", "sortOrder": 5 }
+    ]
+  },
+  {
+    "nameEn": "Food Delivery Services",
+    "nameBn": "ফুড ডেলিভারি সেবা",
+    "slug": "food-delivery",
+    "icon": "🚚",
+    "sortOrder": 4,
+    "subRatings": [
+      { "key": "food_quality", "labelEn": "Food Quality", "labelBn": "খাবারের মান", "sortOrder": 1 },
+      { "key": "delivery_speed", "labelEn": "Delivery Speed", "labelBn": "ডেলিভারি গতি", "sortOrder": 2 },
+      { "key": "value_for_money", "labelEn": "Value for Money", "labelBn": "মূল্য অনুপাত", "sortOrder": 3 },
+      { "key": "customer_service", "labelEn": "Customer Service", "labelBn": "গ্রাহক সেবা", "sortOrder": 4 }
+    ]
+  },
+  {
+    "nameEn": "Banks",
+    "nameBn": "ব্যাংক",
+    "slug": "banks",
+    "icon": "🏦",
+    "sortOrder": 5,
+    "subRatings": [
+      { "key": "app_digital_quality", "labelEn": "App / Digital Quality", "labelBn": "অ্যাপ মান", "sortOrder": 1 },
+      { "key": "branch_service_speed", "labelEn": "Branch Service Speed", "labelBn": "শাখা সেবার গতি", "sortOrder": 2 },
+      { "key": "fee_transparency", "labelEn": "Fee Transparency", "labelBn": "ফি স্বচ্ছতা", "sortOrder": 3 },
+      { "key": "customer_support", "labelEn": "Customer Support", "labelBn": "গ্রাহক সহায়তা", "sortOrder": 4 },
+      { "key": "product_availability", "labelEn": "Product Availability", "labelBn": "পণ্যের প্রাপ্যতা", "sortOrder": 5 }
+    ]
+  },
+  {
+    "nameEn": "Mobile Financial Services (MFS)",
+    "nameBn": "মোবাইল ব্যাংকিং (এমএফএস)",
+    "slug": "mfs",
+    "icon": "💰",
+    "sortOrder": 6,
+    "subRatings": [
+      { "key": "app_digital_quality", "labelEn": "App / Digital Quality", "labelBn": "অ্যাপ মান", "sortOrder": 1 },
+      { "key": "fee_transparency", "labelEn": "Fee Transparency", "labelBn": "ফি স্বচ্ছতা", "sortOrder": 2 },
+      { "key": "customer_support", "labelEn": "Customer Support", "labelBn": "গ্রাহক সহায়তা", "sortOrder": 3 },
+      { "key": "transaction_speed", "labelEn": "Transaction Speed", "labelBn": "লেনদেনের গতি", "sortOrder": 4 }
+    ]
+  },
+  {
+    "nameEn": "Hospitals & Clinics",
+    "nameBn": "হাসপাতাল ও ক্লিনিক",
+    "slug": "hospitals",
+    "icon": "🏥",
+    "sortOrder": 7,
+    "subRatings": [
+      { "key": "doctor_quality", "labelEn": "Doctor Quality", "labelBn": "ডাক্তারের মান", "sortOrder": 1 },
+      { "key": "wait_time", "labelEn": "Wait Time", "labelBn": "অপেক্ষার সময়", "sortOrder": 2 },
+      { "key": "staff_behavior", "labelEn": "Staff Behavior", "labelBn": "কর্মীর আচরণ", "sortOrder": 3 },
+      { "key": "facility_cleanliness", "labelEn": "Facility Cleanliness", "labelBn": "পরিষ্কার-পরিচ্ছন্নতা", "sortOrder": 4 },
+      { "key": "pricing_transparency", "labelEn": "Pricing Transparency", "labelBn": "মূল্য স্বচ্ছতা", "sortOrder": 5 },
+      { "key": "appointment_access", "labelEn": "Appointment Access", "labelBn": "অ্যাপয়েন্টমেন্টের সহজলভ্যতা", "sortOrder": 6 }
+    ]
+  },
+  {
+    "nameEn": "Diagnostic Centers",
+    "nameBn": "ডায়াগনস্টিক সেন্টার",
+    "slug": "diagnostics",
+    "icon": "🔬",
+    "sortOrder": 8,
+    "subRatings": [
+      { "key": "test_accuracy", "labelEn": "Test Accuracy", "labelBn": "পরীক্ষার নির্ভুলতা", "sortOrder": 1 },
+      { "key": "wait_time", "labelEn": "Wait Time", "labelBn": "অপেক্ষার সময়", "sortOrder": 2 },
+      { "key": "staff_behavior", "labelEn": "Staff Behavior", "labelBn": "কর্মীর আচরণ", "sortOrder": 3 },
+      { "key": "facility_cleanliness", "labelEn": "Facility Cleanliness", "labelBn": "পরিষ্কার-পরিচ্ছন্নতা", "sortOrder": 4 },
+      { "key": "pricing_transparency", "labelEn": "Pricing Transparency", "labelBn": "মূল্য স্বচ্ছতা", "sortOrder": 5 }
+    ]
+  },
+  {
+    "nameEn": "Pharmacies",
+    "nameBn": "ফার্মেসি",
+    "slug": "pharmacies",
+    "icon": "💊",
+    "sortOrder": 9,
+    "subRatings": [
+      { "key": "medicine_availability", "labelEn": "Medicine Availability", "labelBn": "ওষুধের প্রাপ্যতা", "sortOrder": 1 },
+      { "key": "staff_knowledge", "labelEn": "Staff Knowledge", "labelBn": "কর্মীর জ্ঞান", "sortOrder": 2 },
+      { "key": "pricing", "labelEn": "Pricing", "labelBn": "মূল্য", "sortOrder": 3 },
+      { "key": "customer_service", "labelEn": "Customer Service", "labelBn": "গ্রাহক সেবা", "sortOrder": 4 }
+    ]
+  }
+]

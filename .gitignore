@@ -32,6 +32,9 @@ pgdata/
 redisdata/
 meilidata/
 
+# Claude Code
+.claude/
+
 # Misc
 *.log
 *.tsbuildinfo
