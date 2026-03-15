@@ -2,6 +2,26 @@ import { getTranslations } from 'next-intl/server';
 import { BusinessCard } from '@/components/business-card';
 import { Link } from '@/i18n/navigation';
 
+export async function generateMetadata({ params, searchParams }: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ q?: string; category?: string }>;
+}): Promise<import('next').Metadata> {
+  const { locale } = await params;
+  const { q, category } = await searchParams;
+  const t = await getTranslations({ locale, namespace: 'search' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+
+  const title = q
+    ? `"${q}" — ${t('title')} | ${tCommon('appName')}`
+    : `${t('title')} | ${tCommon('appName')}`;
+
+  return {
+    title,
+    description: `${t('title')} ${category ? `— ${category}` : ''} | ReviewBD`,
+    robots: { index: !q, follow: true }, // Don't index search result pages with queries
+  };
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 async function searchBusinesses(params: {

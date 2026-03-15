@@ -3,6 +3,23 @@ import { SearchBar } from '@/components/search-bar';
 import { CategoryGrid } from '@/components/category-grid';
 import { BusinessCard } from '@/components/business-card';
 
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<import('next').Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'home' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+  return {
+    title: `${tCommon('appName')} — ${tCommon('tagline')}`,
+    description: t('heroSubtitle'),
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://reviewbd.com'}/${locale}`,
+      languages: {
+        'bn': `${process.env.NEXT_PUBLIC_APP_URL || 'https://reviewbd.com'}/bn`,
+        'en': `${process.env.NEXT_PUBLIC_APP_URL || 'https://reviewbd.com'}/en`,
+      },
+    },
+  };
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 async function getCategories() {
@@ -43,6 +60,26 @@ export default async function HomePage({
 
   return (
     <div className="flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'ReviewBD',
+            url: process.env.NEXT_PUBLIC_APP_URL || 'https://reviewbd.com',
+            description: 'Bangladesh\'s trusted review and ratings platform',
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: {
+                '@type': 'EntryPoint',
+                urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || 'https://reviewbd.com'}/${locale}/search?q={search_term_string}`,
+              },
+              'query-input': 'required name=search_term_string',
+            },
+          }),
+        }}
+      />
       {/* Hero Section */}
       <section className="py-20 px-4 bg-linear-to-b from-primary/5 to-background">
         <div className="mx-auto max-w-4xl text-center">

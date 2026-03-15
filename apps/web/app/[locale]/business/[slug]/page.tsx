@@ -43,8 +43,17 @@ export async function generateMetadata({
   await getTranslations({ locale, namespace: 'common' });
   return {
     title: business.name,
-    description: business.description,
-    openGraph: { title: business.name, description: business.description },
+    description: business.description ?? `Reviews and ratings for ${business.name}`,
+    openGraph: {
+      title: business.name,
+      description: business.description ?? undefined,
+      images: business.coverUrl ? [{ url: business.coverUrl }] : [],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: business.name,
+    },
   };
 }
 
@@ -78,6 +87,32 @@ export default async function BusinessPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
+      {/* JSON-LD structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'LocalBusiness',
+            name: business.name,
+            description: business.description ?? undefined,
+            url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://reviewbd.com'}/${locale}/business/${business.slug}`,
+            telephone: business.phone ?? undefined,
+            address: business.address
+              ? { '@type': 'PostalAddress', streetAddress: business.address, addressCountry: 'BD' }
+              : undefined,
+            aggregateRating: avgRating
+              ? {
+                  '@type': 'AggregateRating',
+                  ratingValue: avgRating.toFixed(1),
+                  reviewCount: business.reviewCount,
+                  bestRating: '5',
+                  worstRating: '1',
+                }
+              : undefined,
+          }),
+        }}
+      />
       {/* Business Header */}
       <div className="rounded-xl border bg-background overflow-hidden mb-6">
         {business.coverUrl && (

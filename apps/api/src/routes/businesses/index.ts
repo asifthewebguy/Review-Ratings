@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { BusinessService } from '../../services/business.service.js';
 import { ReviewService } from '../../services/review.service.js';
+import { cached, invalidate } from '../../lib/cache.js';
 
 export async function businessRoutes(app: FastifyInstance) {
   const svc = new BusinessService(app.prisma, app.meilisearch);
@@ -103,15 +104,17 @@ export async function businessRoutes(app: FastifyInstance) {
   app.get('/:slug', async (request, reply) => {
     const { slug } = request.params as { slug: string };
 
-    const business = await app.prisma.business.findUnique({
-      where: { slug },
-      include: {
-        category: { include: { subRatings: true } },
-        district: { include: { division: true } },
-        upazila: true,
-        _count: { select: { reviews: { where: { status: 'published' } } } },
-      },
-    });
+    const business = await cached(app.redis, `business:slug:${slug}`, 300, () =>
+      app.prisma.business.findUnique({
+        where: { slug },
+        include: {
+          category: { include: { subRatings: true } },
+          district: { include: { division: true } },
+          upazila: true,
+          _count: { select: { reviews: { where: { status: 'published' } } } },
+        },
+      }),
+    );
 
     if (!business) {
       return reply.code(404).send({
@@ -181,6 +184,7 @@ export async function businessRoutes(app: FastifyInstance) {
     });
 
     svc.syncToSearch(id).catch((err) => app.log.error(err, 'sync failed'));
+    await invalidate(app.redis, 'business:slug:*');
 
     return reply.send({ success: true, data: updated });
   });

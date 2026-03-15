@@ -21,6 +21,18 @@ export async function generateMetadata({
       template: `%s | ${t('appName')}`,
     },
     description: t('tagline'),
+    openGraph: {
+      type: 'website',
+      locale: locale === 'bn' ? 'bn_BD' : 'en_US',
+      siteName: t('appName'),
+      title: `${t('appName')} — ${t('tagline')}`,
+      description: t('tagline'),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${t('appName')} — ${t('tagline')}`,
+      description: t('tagline'),
+    },
   };
 }
 
@@ -48,6 +60,10 @@ export default async function LocaleLayout({
           href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <link rel="canonical" href={`${process.env.NEXT_PUBLIC_APP_URL || 'https://reviewbd.com'}/${locale}`} />
+        <link rel="alternate" hrefLang="bn" href={`${process.env.NEXT_PUBLIC_APP_URL || 'https://reviewbd.com'}/bn`} />
+        <link rel="alternate" hrefLang="en" href={`${process.env.NEXT_PUBLIC_APP_URL || 'https://reviewbd.com'}/en`} />
+        <link rel="alternate" hrefLang="x-default" href={`${process.env.NEXT_PUBLIC_APP_URL || 'https://reviewbd.com'}/bn`} />
       </head>
       <body className="min-h-screen bg-background antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
