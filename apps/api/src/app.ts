@@ -12,6 +12,7 @@ import { locationRoutes } from './routes/locations/index.js';
 import { categoryRoutes } from './routes/categories/index.js';
 import { userRoutes } from './routes/users/index.js';
 import { businessRoutes } from './routes/businesses/index.js';
+import { claimRoutes } from './routes/businesses/claim.js';
 import { reviewRoutes } from './routes/reviews/index.js';
 import { searchRoutes } from './routes/search/index.js';
 
@@ -54,6 +55,7 @@ export async function buildApp() {
   await app.register(categoryRoutes, { prefix: '/api/v1/categories' });
   await app.register(userRoutes, { prefix: '/api/v1/users' });
   await app.register(businessRoutes, { prefix: '/api/v1/businesses' });
+  await app.register(claimRoutes, { prefix: '/api/v1/businesses' });
   await app.register(reviewRoutes, { prefix: '/api/v1/reviews' });
   await app.register(searchRoutes, { prefix: '/api/v1/search' });
 

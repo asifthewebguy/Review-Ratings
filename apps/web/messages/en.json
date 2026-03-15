@@ -102,5 +102,43 @@
     "terms": "Terms of Service",
     "contact": "Contact",
     "copyright": "© 2026 ReviewBD. All rights reserved."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "myBusinesses": "My Businesses",
+    "overview": "Overview",
+    "totalReviews": "Total Reviews",
+    "avgRating": "Average Rating",
+    "responseRate": "Response Rate",
+    "recentReviews": "Recent Reviews",
+    "respond": "Respond",
+    "editResponse": "Edit Response",
+    "responsePlaceholder": "Write your response (max 500 characters)",
+    "submitResponse": "Submit Response",
+    "ratingTrend": "Rating Trend (30 days)",
+    "editProfile": "Edit Profile",
+    "saveProfile": "Save",
+    "saving": "Saving...",
+    "profileSaved": "Profile updated",
+    "noClaimed": "You have no claimed businesses",
+    "claimNow": "Claim a Business",
+    "pendingClaims": "Pending Claims"
+  },
+  "claim": {
+    "title": "Claim Business Ownership",
+    "subtitle": "Upload a document to verify your ownership",
+    "docType": "Document Type",
+    "tradeLicense": "Trade License",
+    "nid": "National ID (NID)",
+    "docUrl": "Document Image URL",
+    "docUrlBack": "Back of Document URL (optional)",
+    "submit": "Submit Claim",
+    "submitting": "Submitting...",
+    "success": "Your claim has been submitted. You will be notified via SMS after review.",
+    "pending": "Under Review",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "alreadyClaimed": "This business is already claimed",
+    "loginRequired": "Please login to claim this business"
   }
 }

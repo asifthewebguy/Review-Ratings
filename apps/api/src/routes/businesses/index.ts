@@ -292,4 +292,74 @@ export async function businessRoutes(app: FastifyInstance) {
 
     return reply.code(201).send({ success: true, data: review });
   });
+
+  // GET /businesses/:id/stats — rating trend and breakdown (claimed owner or admin)
+  app.get('/:id/stats', {
+    preHandler: app.authenticate,
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const user = request.user;
+
+    const business = await app.prisma.business.findUnique({ where: { id } });
+    if (!business) {
+      return reply.code(404).send({ success: false, error: { code: 'NOT_FOUND', message: 'Business not found' } });
+    }
+
+    const isOwner = business.claimedBy === user.sub;
+    const isAdmin = ['admin', 'moderator'].includes(user.role);
+    if (!isOwner && !isAdmin) {
+      return reply.code(403).send({ success: false, error: { code: 'FORBIDDEN', message: 'Not authorized' } });
+    }
+
+    // Rating distribution
+    const distribution = await app.prisma.review.groupBy({
+      by: ['rating'],
+      where: { businessId: id, status: 'published' },
+      _count: true,
+    });
+
+    // 30-day trend: count reviews per day for last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentReviews = await app.prisma.review.findMany({
+      where: { businessId: id, status: 'published', createdAt: { gte: thirtyDaysAgo } },
+      select: { rating: true, createdAt: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    // Group by date
+    const trendMap: Record<string, { count: number; ratingSum: number }> = {};
+    recentReviews.forEach((r) => {
+      const date = r.createdAt.toISOString().split('T')[0]!;
+      if (!trendMap[date]) trendMap[date] = { count: 0, ratingSum: 0 };
+      trendMap[date]!.count++;
+      trendMap[date]!.ratingSum += r.rating;
+    });
+
+    const trend = Object.entries(trendMap).map(([date, { count, ratingSum }]) => ({
+      date,
+      count,
+      avgRating: count > 0 ? parseFloat((ratingSum / count).toFixed(2)) : 0,
+    }));
+
+    // Response rate
+    const totalPublished = await app.prisma.review.count({ where: { businessId: id, status: 'published' } });
+    const responded = await app.prisma.response.count({ where: { businessId: id } });
+    const responseRate = totalPublished > 0 ? parseFloat(((responded / totalPublished) * 100).toFixed(1)) : 0;
+
+    return reply.send({
+      success: true,
+      data: {
+        avgRating: business.avgRating ? Number(business.avgRating) : null,
+        reviewCount: business.reviewCount,
+        responseRate,
+        ratingDistribution: distribution.reduce((acc, d) => {
+          acc[d.rating] = d._count;
+          return acc;
+        }, {} as Record<number, number>),
+        trend,
+      },
+    });
+  });
 }

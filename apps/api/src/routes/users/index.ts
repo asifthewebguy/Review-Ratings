@@ -89,4 +89,38 @@ export async function userRoutes(app: FastifyInstance) {
       },
     });
   });
+
+  // GET /users/me/businesses — get businesses claimed by current user
+  app.get('/me/businesses', {
+    preHandler: app.authenticate,
+  }, async (request, reply) => {
+    const userId = request.user.sub;
+
+    const businesses = await app.prisma.business.findMany({
+      where: { claimedBy: userId, isActive: true },
+      include: {
+        category: true,
+        district: true,
+        _count: { select: { reviews: { where: { status: 'published' } } } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return reply.send({ success: true, data: businesses });
+  });
+
+  // GET /users/me/claims — get claim submissions by current user
+  app.get('/me/claims', {
+    preHandler: app.authenticate,
+  }, async (request, reply) => {
+    const userId = request.user.sub;
+
+    const claims = await app.prisma.claim.findMany({
+      where: { userId },
+      include: { business: { select: { id: true, name: true, slug: true, logoUrl: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return reply.send({ success: true, data: claims });
+  });
 }

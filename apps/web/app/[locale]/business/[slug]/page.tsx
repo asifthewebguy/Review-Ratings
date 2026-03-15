@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { ReviewCard } from '@/components/review-card';
 import { ReviewFormWrapper } from '@/components/review-form-wrapper';
 import { StarRating, RatingBadge } from '@/components/ui/star-rating';
+import { ClaimButton } from '@/components/claim-button';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
@@ -148,6 +149,12 @@ export default async function BusinessPage({
               </span>
             )}
           </div>
+
+          {!business.isClaimed && (
+            <div className="mt-4">
+              <ClaimButton businessId={business.id} businessName={business.name} locale={locale} />
+            </div>
+          )}
         </div>
       </div>
 

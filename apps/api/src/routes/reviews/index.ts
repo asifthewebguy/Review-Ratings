@@ -214,4 +214,42 @@ export async function reviewRoutes(app: FastifyInstance) {
 
     return reply.code(201).send({ success: true, data: response });
   });
+
+  // PATCH /reviews/:id/response — edit response (business owner, within 24h)
+  app.patch('/:id/response', {
+    preHandler: app.authenticate,
+  }, async (request, reply) => {
+    const { id: reviewId } = request.params as { id: string };
+    const userId = request.user.sub;
+    const body = request.body as any;
+
+    const response = await app.prisma.response.findUnique({
+      where: { reviewId },
+      include: { business: true },
+    });
+    if (!response) {
+      return reply.code(404).send({ success: false, error: { code: 'NOT_FOUND', message: 'Response not found' } });
+    }
+
+    if (response.business.claimedBy !== userId && request.user.role !== 'admin') {
+      return reply.code(403).send({ success: false, error: { code: 'FORBIDDEN', message: 'Not authorized' } });
+    }
+
+    // 24h edit lock
+    const hoursSince = (Date.now() - response.createdAt.getTime()) / 3_600_000;
+    if (hoursSince > 24) {
+      return reply.code(422).send({ success: false, error: { code: 'EDIT_LOCKED', message: 'Response can only be edited within 24 hours' } });
+    }
+
+    if (body.body?.length > 500) {
+      return reply.code(422).send({ success: false, error: { code: 'TOO_LONG', message: 'Response max 500 characters' } });
+    }
+
+    const updated = await app.prisma.response.update({
+      where: { reviewId },
+      data: { body: body.body, isEdited: true },
+    });
+
+    return reply.send({ success: true, data: updated });
+  });
 }
