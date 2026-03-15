@@ -19,7 +19,12 @@
     "edit": "সম্পাদনা",
     "delete": "মুছুন",
     "viewAll": "সব দেখুন",
-    "noResults": "কোনো ফলাফল পাওয়া যায়নি"
+    "noResults": "কোনো ফলাফল পাওয়া যায়নি",
+    "errors": {
+      "notFound": "পৃষ্ঠাটি পাওয়া যায়নি",
+      "serverError": "সার্ভার ত্রুটি",
+      "tryAgain": "আবার চেষ্টা করুন"
+    }
   },
   "ratings": {
     "excellent": "অসাধারণ",
@@ -140,5 +145,30 @@
     "rejected": "প্রত্যাখ্যাত",
     "alreadyClaimed": "এই ব্যবসা ইতিমধ্যে দাবি করা হয়েছে",
     "loginRequired": "দাবি করতে লগইন করুন"
+  },
+  "admin": {
+    "title": "অ্যাডমিন প্যানেল",
+    "flags": "ফ্ল্যাগ কিউ",
+    "claims": "দাবি কিউ",
+    "analytics": "বিশ্লেষণ",
+    "users": "ব্যবহারকারী",
+    "pendingFlags": "মুলতুবি ফ্ল্যাগ",
+    "pendingClaims": "মুলতুবি দাবি",
+    "removeReview": "রিভিউ মুছুন",
+    "dismissFlag": "ফ্ল্যাগ বাতিল করুন",
+    "approveClaim": "দাবি অনুমোদন",
+    "rejectClaim": "দাবি প্রত্যাখ্যান",
+    "reason": "কারণ",
+    "action": "কর্ম",
+    "totalUsers": "মোট ব্যবহারকারী",
+    "totalBusinesses": "মোট ব্যবসা",
+    "totalReviews": "মোট রিভিউ",
+    "flaggedReviews": "ফ্ল্যাগড রিভিউ",
+    "noFlags": "কোনো মুলতুবি ফ্ল্যাগ নেই",
+    "noClaims": "কোনো মুলতুবি দাবি নেই",
+    "suspend": "স্থগিত করুন",
+    "activate": "সক্রিয় করুন",
+    "searchByPhone": "ফোন নম্বর দিয়ে খুঁজুন",
+    "dailyReviews": "দৈনিক রিভিউ (৭ দিন)"
   }
 }

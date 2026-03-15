@@ -70,6 +70,15 @@ export function Header({ locale }: HeaderProps) {
                       >
                         {t('dashboard')}
                       </Link>
+                      {(user?.role === 'admin' || user?.role === 'moderator') && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setShowUserMenu(false)}
+                          className="block px-4 py-2 text-sm hover:bg-muted transition-colors text-red-600"
+                        >
+                          {locale === 'bn' ? 'অ্যাডমিন প্যানেল' : 'Admin Panel'}
+                        </Link>
+                      )}
                       <hr className="my-1" />
                       <button
                         onClick={handleLogout}

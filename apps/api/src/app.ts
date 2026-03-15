@@ -15,6 +15,7 @@ import { businessRoutes } from './routes/businesses/index.js';
 import { claimRoutes } from './routes/businesses/claim.js';
 import { reviewRoutes } from './routes/reviews/index.js';
 import { searchRoutes } from './routes/search/index.js';
+import { adminRoutes } from './routes/admin/index.js';
 
 export async function buildApp() {
   const app = Fastify({
@@ -58,6 +59,7 @@ export async function buildApp() {
   await app.register(claimRoutes, { prefix: '/api/v1/businesses' });
   await app.register(reviewRoutes, { prefix: '/api/v1/reviews' });
   await app.register(searchRoutes, { prefix: '/api/v1/search' });
+  await app.register(adminRoutes, { prefix: '/api/v1/admin' });
 
   return app;
 }

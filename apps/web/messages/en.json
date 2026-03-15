@@ -19,7 +19,12 @@
     "edit": "Edit",
     "delete": "Delete",
     "viewAll": "View All",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "errors": {
+      "notFound": "Page not found",
+      "serverError": "Server error",
+      "tryAgain": "Try again"
+    }
   },
   "ratings": {
     "excellent": "Excellent",
@@ -140,5 +145,30 @@
     "rejected": "Rejected",
     "alreadyClaimed": "This business is already claimed",
     "loginRequired": "Please login to claim this business"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "flags": "Flag Queue",
+    "claims": "Claim Queue",
+    "analytics": "Analytics",
+    "users": "Users",
+    "pendingFlags": "Pending Flags",
+    "pendingClaims": "Pending Claims",
+    "removeReview": "Remove Review",
+    "dismissFlag": "Dismiss Flag",
+    "approveClaim": "Approve Claim",
+    "rejectClaim": "Reject Claim",
+    "reason": "Reason",
+    "action": "Action",
+    "totalUsers": "Total Users",
+    "totalBusinesses": "Total Businesses",
+    "totalReviews": "Total Reviews",
+    "flaggedReviews": "Flagged Reviews",
+    "noFlags": "No pending flags",
+    "noClaims": "No pending claims",
+    "suspend": "Suspend",
+    "activate": "Activate",
+    "searchByPhone": "Search by phone",
+    "dailyReviews": "Daily Reviews (7 days)"
   }
 }
