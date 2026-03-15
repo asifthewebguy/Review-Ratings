@@ -1,0 +1,66 @@
+{
+  "common": {
+    "appName": "ReviewBD",
+    "tagline": "বাংলাদেশের বিশ্বস্ত রিভিউ প্ল্যাটফর্ম",
+    "search": "খুঁজুন",
+    "searchPlaceholder": "ব্যবসা খুঁজুন...",
+    "login": "লগইন",
+    "logout": "লগআউট",
+    "home": "হোম",
+    "categories": "ক্যাটেগরি",
+    "dashboard": "ড্যাশবোর্ড",
+    "admin": "অ্যাডমিন",
+    "loading": "লোড হচ্ছে...",
+    "error": "কিছু একটা সমস্যা হয়েছে",
+    "retry": "আবার চেষ্টা করুন",
+    "submit": "জমা দিন",
+    "cancel": "বাতিল",
+    "save": "সংরক্ষণ করুন",
+    "edit": "সম্পাদনা",
+    "delete": "মুছুন",
+    "viewAll": "সব দেখুন",
+    "noResults": "কোনো ফলাফল পাওয়া যায়নি"
+  },
+  "ratings": {
+    "excellent": "অসাধারণ",
+    "veryGood": "খুব ভালো",
+    "average": "গড়",
+    "bad": "খারাপ",
+    "veryBad": "অত্যন্ত খারাপ",
+    "reviews": "রিভিউ",
+    "writeReview": "রিভিউ লিখুন",
+    "overallRating": "সামগ্রিক রেটিং"
+  },
+  "auth": {
+    "phoneNumber": "ফোন নম্বর",
+    "enterPhone": "আপনার ফোন নম্বর দিন",
+    "enterOtp": "OTP কোড দিন",
+    "otpSent": "আপনার ফোনে একটি কোড পাঠানো হয়েছে",
+    "verifyOtp": "যাচাই করুন",
+    "resendOtp": "আবার কোড পাঠান",
+    "loginTitle": "লগইন করুন",
+    "loginSubtitle": "আপনার ফোন নম্বর দিয়ে লগইন করুন"
+  },
+  "home": {
+    "heroTitle": "বিশ্বস্ত রিভিউ, সৎ মতামত",
+    "heroSubtitle": "বাংলাদেশের ব্যবসা ও সেবা সম্পর্কে সত্যিকারের রিভিউ পড়ুন এবং লিখুন",
+    "topRated": "সর্বোচ্চ রেটিং",
+    "recentReviews": "সাম্প্রতিক রিভিউ",
+    "browseCategories": "ক্যাটেগরি ব্রাউজ করুন"
+  },
+  "business": {
+    "claimed": "দাবিকৃত ও যাচাইকৃত",
+    "claimedOnly": "দাবিকৃত",
+    "unclaimed": "দাবি করা হয়নি",
+    "claimBusiness": "এই ব্যবসা দাবি করুন",
+    "businessResponse": "ব্যবসার প্রতিক্রিয়া",
+    "reportReview": "রিভিউ রিপোর্ট করুন"
+  },
+  "footer": {
+    "about": "আমাদের সম্পর্কে",
+    "privacy": "গোপনীয়তা নীতি",
+    "terms": "শর্তাবলী",
+    "contact": "যোগাযোগ",
+    "copyright": "© ২০২৬ ReviewBD। সর্বস্বত্ব সংরক্ষিত।"
+  }
+}

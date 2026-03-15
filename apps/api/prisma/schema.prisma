@@ -1,0 +1,297 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────────────────
+// USERS
+// ──────────────────────────────────────────────────────────
+model User {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phone         String    @unique @db.VarChar(15)
+  displayName   String    @map("display_name") @db.VarChar(50)
+  avatarUrl     String?   @map("avatar_url")
+  role          String    @default("user") @db.VarChar(20) // user | business_owner | moderator | admin
+  trustLevel    Int       @default(0) @map("trust_level") @db.SmallInt // 0=New, 1=Active, 2=Trusted, 3=Top
+  reviewerScore Int       @default(0) @map("reviewer_score")
+  isActive      Boolean   @default(true) @map("is_active")
+  verifiedAt    DateTime? @map("verified_at") @db.Timestamptz()
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  reviews          Review[]
+  flags            Flag[]         @relation("FlagReporter")
+  resolvedFlags    Flag[]         @relation("FlagResolver")
+  claimedBusinesses Business[]    @relation("ClaimedBy")
+  claims           Claim[]        @relation("Claimant")
+  reviewedClaims   Claim[]        @relation("ClaimReviewer")
+
+  @@map("users")
+}
+
+// ──────────────────────────────────────────────────────────
+// DIVISIONS
+// ──────────────────────────────────────────────────────────
+model Division {
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nameEn String @map("name_en") @db.VarChar(50)
+  nameBn String @map("name_bn") @db.VarChar(50)
+
+  districts District[]
+
+  @@map("divisions")
+}
+
+// ──────────────────────────────────────────────────────────
+// DISTRICTS
+// ──────────────────────────────────────────────────────────
+model District {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  divisionId String @map("division_id") @db.Uuid
+  nameEn     String @map("name_en") @db.VarChar(80)
+  nameBn     String @map("name_bn") @db.VarChar(80)
+
+  division   Division   @relation(fields: [divisionId], references: [id])
+  upazilas   Upazila[]
+  businesses Business[]
+
+  @@map("districts")
+}
+
+// ──────────────────────────────────────────────────────────
+// UPAZILAS
+// ──────────────────────────────────────────────────────────
+model Upazila {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  districtId String @map("district_id") @db.Uuid
+  nameEn     String @map("name_en") @db.VarChar(100)
+  nameBn     String @map("name_bn") @db.VarChar(100)
+
+  district   District   @relation(fields: [districtId], references: [id])
+  businesses Business[]
+
+  @@map("upazilas")
+}
+
+// ──────────────────────────────────────────────────────────
+// CATEGORIES
+// ──────────────────────────────────────────────────────────
+model Category {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nameEn    String  @map("name_en") @db.VarChar(100)
+  nameBn    String  @map("name_bn") @db.VarChar(100)
+  slug      String  @unique @db.VarChar(110)
+  parentId  String? @map("parent_id") @db.Uuid
+  icon      String? @db.VarChar(50)
+  sortOrder Int     @default(0) @map("sort_order")
+  isActive  Boolean @default(true) @map("is_active")
+
+  parent     Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children   Category[] @relation("CategoryHierarchy")
+  businesses Business[]
+  subRatings CategorySubRating[]
+
+  @@map("categories")
+}
+
+// ──────────────────────────────────────────────────────────
+// CATEGORY SUB-RATINGS (sector-specific rating dimensions)
+// ──────────────────────────────────────────────────────────
+model CategorySubRating {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  categoryId String @map("category_id") @db.Uuid
+  key        String @db.VarChar(50) // e.g. "delivery_speed", "food_quality"
+  labelEn    String @map("label_en") @db.VarChar(100)
+  labelBn    String @map("label_bn") @db.VarChar(100)
+  sortOrder  Int    @default(0) @map("sort_order")
+
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([categoryId, key])
+  @@map("category_sub_ratings")
+}
+
+// ──────────────────────────────────────────────────────────
+// BUSINESSES
+// ──────────────────────────────────────────────────────────
+model Business {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String    @db.VarChar(200)
+  slug         String    @unique @db.VarChar(220)
+  description  String?
+  categoryId   String    @map("category_id") @db.Uuid
+  districtId   String    @map("district_id") @db.Uuid
+  upazilaId    String?   @map("upazila_id") @db.Uuid
+  address      String?
+  phone        String?   @db.VarChar(20)
+  website      String?
+  facebookUrl  String?   @map("facebook_url")
+  logoUrl      String?   @map("logo_url")
+  coverUrl     String?   @map("cover_url")
+  hours        Json?     // { mon: {open: "09:00", close: "21:00"}, ... }
+  isClaimed    Boolean   @default(false) @map("is_claimed")
+  claimedBy    String?   @map("claimed_by") @db.Uuid
+  verifiedTier String    @default("none") @map("verified_tier") @db.VarChar(20) // none | basic | verified | pro | enterprise
+  verifiedAt   DateTime? @map("verified_at") @db.Timestamptz()
+  avgRating    Decimal?  @map("avg_rating") @db.Decimal(3, 2)
+  reviewCount  Int       @default(0) @map("review_count")
+  trustScore   Decimal?  @map("trust_score") @db.Decimal(5, 4)
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  category     Category     @relation(fields: [categoryId], references: [id])
+  district     District     @relation(fields: [districtId], references: [id])
+  upazila      Upazila?     @relation(fields: [upazilaId], references: [id])
+  claimedByUser User?       @relation("ClaimedBy", fields: [claimedBy], references: [id])
+  reviews      Review[]
+  responses    Response[]
+  claims       Claim[]
+  subscription Subscription?
+
+  @@index([categoryId], map: "idx_businesses_category")
+  @@index([districtId], map: "idx_businesses_district")
+  @@index([slug], map: "idx_businesses_slug")
+  @@index([trustScore(sort: Desc)], map: "idx_businesses_trust_score")
+  @@map("businesses")
+}
+
+// ──────────────────────────────────────────────────────────
+// REVIEWS
+// ──────────────────────────────────────────────────────────
+model Review {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId        String    @map("business_id") @db.Uuid
+  userId            String    @map("user_id") @db.Uuid
+  rating            Int       @db.SmallInt
+  body              String
+  language          String    @default("bn") @db.VarChar(5) // bn | en | mixed
+  photoUrls         String[]  @map("photo_urls")
+  subRatings        Json?     @map("sub_ratings") // { "delivery_speed": 4, "food_quality": 5, ... }
+  isVerifiedPurchase Boolean  @default(false) @map("is_verified_purchase")
+  status            String    @default("published") @db.VarChar(20) // published | flagged | removed | pending
+  removalReason     String?   @map("removal_reason") @db.VarChar(100)
+  flagCount         Int       @default(0) @map("flag_count")
+  helpfulCount      Int       @default(0) @map("helpful_count")
+  ipAddress         String?   @map("ip_address") @db.VarChar(45) // IPv4/IPv6
+  editedAt          DateTime? @map("edited_at") @db.Timestamptz()
+  editLockedAt      DateTime? @map("edit_locked_at") @db.Timestamptz() // 48h after creation
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  business Business  @relation(fields: [businessId], references: [id])
+  user     User      @relation(fields: [userId], references: [id])
+  response Response?
+  flags    Flag[]
+
+  @@unique([businessId, userId])
+  @@index([businessId, status, createdAt(sort: Desc)], map: "idx_reviews_business")
+  @@index([userId], map: "idx_reviews_user")
+  @@index([status], map: "idx_reviews_status")
+  @@map("reviews")
+}
+
+// ──────────────────────────────────────────────────────────
+// RESPONSES (business replies to reviews)
+// ──────────────────────────────────────────────────────────
+model Response {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reviewId     String    @unique @map("review_id") @db.Uuid
+  businessId   String    @map("business_id") @db.Uuid
+  body         String
+  isEdited     Boolean   @default(false) @map("is_edited")
+  editLockedAt DateTime? @map("edit_locked_at") @db.Timestamptz()
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  review   Review   @relation(fields: [reviewId], references: [id])
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@map("responses")
+}
+
+// ──────────────────────────────────────────────────────────
+// FLAGS (user-reported reviews)
+// ──────────────────────────────────────────────────────────
+model Flag {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reviewId   String    @map("review_id") @db.Uuid
+  reporterId String    @map("reporter_id") @db.Uuid
+  reason     String    @db.VarChar(50) // fake | offensive | irrelevant | conflict | other
+  detail     String?
+  status     String    @default("pending") @db.VarChar(20) // pending | reviewed | dismissed
+  resolvedBy String?   @map("resolved_by") @db.Uuid
+  resolvedAt DateTime? @map("resolved_at") @db.Timestamptz()
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  review   Review @relation(fields: [reviewId], references: [id])
+  reporter User   @relation("FlagReporter", fields: [reporterId], references: [id])
+  resolver User?  @relation("FlagResolver", fields: [resolvedBy], references: [id])
+
+  @@unique([reviewId, reporterId])
+  @@map("flags")
+}
+
+// ──────────────────────────────────────────────────────────
+// CLAIMS (business ownership requests)
+// ──────────────────────────────────────────────────────────
+model Claim {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId      String    @map("business_id") @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  docType         String    @map("doc_type") @db.VarChar(20) // trade_license | nid
+  docUrl          String    @map("doc_url")
+  docUrlBack      String?   @map("doc_url_back")
+  status          String    @default("pending") @db.VarChar(20) // pending | approved | rejected
+  rejectionReason String?   @map("rejection_reason")
+  reviewedBy      String?   @map("reviewed_by") @db.Uuid
+  reviewedAt      DateTime? @map("reviewed_at") @db.Timestamptz()
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  business Business @relation(fields: [businessId], references: [id])
+  user     User     @relation("Claimant", fields: [userId], references: [id])
+  reviewer User?    @relation("ClaimReviewer", fields: [reviewedBy], references: [id])
+
+  @@map("claims")
+}
+
+// ──────────────────────────────────────────────────────────
+// SUBSCRIPTIONS
+// ──────────────────────────────────────────────────────────
+model Subscription {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId    String    @unique @map("business_id") @db.Uuid
+  plan          String    @db.VarChar(20) // free | verified | pro | enterprise
+  billingCycle  String    @default("monthly") @map("billing_cycle") @db.VarChar(10)
+  priceBdt      Int?      @map("price_bdt")
+  paymentMethod String?   @map("payment_method") @db.VarChar(20) // bkash | nagad | bank_transfer
+  startedAt     DateTime  @default(now()) @map("started_at") @db.Timestamptz()
+  expiresAt     DateTime? @map("expires_at") @db.Timestamptz()
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@map("subscriptions")
+}
+
+// ──────────────────────────────────────────────────────────
+// OTP ATTEMPTS (audit trail — Redis is primary OTP store)
+// ──────────────────────────────────────────────────────────
+model OtpAttempt {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phone     String    @db.VarChar(15)
+  codeHash  String    @map("code_hash") @db.VarChar(64)
+  purpose   String    @db.VarChar(20) // login | claim | review
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz()
+  usedAt    DateTime? @map("used_at") @db.Timestamptz()
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@index([phone, createdAt(sort: Desc)], map: "idx_otp_phone")
+  @@map("otp_attempts")
+}

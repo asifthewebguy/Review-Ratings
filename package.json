@@ -1,0 +1,29 @@
+{
+  "name": "review-ratings",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel -r run dev",
+    "dev:api": "pnpm --filter @review-ratings/api run dev",
+    "dev:web": "pnpm --filter @review-ratings/web run dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "lint:fix": "pnpm -r run lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "db:migrate": "pnpm --filter @review-ratings/api run db:migrate",
+    "db:seed": "pnpm --filter @review-ratings/api run db:seed",
+    "db:studio": "pnpm --filter @review-ratings/api run db:studio",
+    "db:generate": "pnpm --filter @review-ratings/api run db:generate"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

@@ -1,0 +1,66 @@
+{
+  "common": {
+    "appName": "ReviewBD",
+    "tagline": "Bangladesh's Trusted Review Platform",
+    "search": "Search",
+    "searchPlaceholder": "Search businesses...",
+    "login": "Login",
+    "logout": "Logout",
+    "home": "Home",
+    "categories": "Categories",
+    "dashboard": "Dashboard",
+    "admin": "Admin",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "viewAll": "View All",
+    "noResults": "No results found"
+  },
+  "ratings": {
+    "excellent": "Excellent",
+    "veryGood": "Very Good",
+    "average": "Average",
+    "bad": "Bad",
+    "veryBad": "Very Bad",
+    "reviews": "reviews",
+    "writeReview": "Write a Review",
+    "overallRating": "Overall Rating"
+  },
+  "auth": {
+    "phoneNumber": "Phone Number",
+    "enterPhone": "Enter your phone number",
+    "enterOtp": "Enter OTP code",
+    "otpSent": "A code has been sent to your phone",
+    "verifyOtp": "Verify",
+    "resendOtp": "Resend code",
+    "loginTitle": "Login",
+    "loginSubtitle": "Login with your phone number"
+  },
+  "home": {
+    "heroTitle": "Trusted Reviews, Honest Opinions",
+    "heroSubtitle": "Read and write genuine reviews about businesses and services in Bangladesh",
+    "topRated": "Top Rated",
+    "recentReviews": "Recent Reviews",
+    "browseCategories": "Browse Categories"
+  },
+  "business": {
+    "claimed": "Claimed & Verified",
+    "claimedOnly": "Claimed",
+    "unclaimed": "Unclaimed",
+    "claimBusiness": "Claim this business",
+    "businessResponse": "Business Response",
+    "reportReview": "Report Review"
+  },
+  "footer": {
+    "about": "About Us",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact",
+    "copyright": "© 2026 ReviewBD. All rights reserved."
+  }
+}
