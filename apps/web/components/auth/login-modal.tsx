@@ -147,7 +147,7 @@ export function LoginModal({ onClose, onSuccess }: LoginModalProps) {
               error={error}
             />
 
-            <Button onClick={handleVerifyOtp} loading={loading} size="lg" className="w-full">
+            <Button onClick={() => handleVerifyOtp()} loading={loading} size="lg" className="w-full">
               {t('verifyOtp')}
             </Button>
 
