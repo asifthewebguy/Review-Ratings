@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/store';
 import { StarRating } from '@/components/ui/star-rating';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_URL = '/api/v1';
 
 export function FlagQueue({ locale }: { locale: string }) {
   const t = useTranslations('admin');

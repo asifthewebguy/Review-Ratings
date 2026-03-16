@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/store';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_URL = '/api/v1';
 
 interface AnalyticsData {
   totals: { users: number; businesses: number; reviews: number; claims: number };

@@ -10,7 +10,7 @@ import { ReviewCard } from '@/components/review-card';
 import { ResponseForm } from '@/components/response-form';
 import { Link } from '@/i18n/navigation';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_URL = '/api/v1';
 
 interface DashboardClientProps {
   locale: string;

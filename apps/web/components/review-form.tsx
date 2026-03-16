@@ -12,7 +12,7 @@ interface ReviewFormProps {
   onLoginRequired?: () => void;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_URL = '/api/v1';
 
 export function ReviewForm({
   businessId,

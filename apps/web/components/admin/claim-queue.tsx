@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/store';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_URL = '/api/v1';
 
 export function ClaimQueue({ locale }: { locale: string }) {
   const t = useTranslations('admin');

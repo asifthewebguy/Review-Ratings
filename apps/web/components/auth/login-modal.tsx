@@ -50,9 +50,9 @@ export function LoginModal({ onClose, onSuccess }: LoginModalProps) {
     }
   }
 
-  async function handleVerifyOtp() {
+  async function handleVerifyOtp(code = otp) {
     setError('');
-    if (otp.length !== 6) {
+    if (code.length !== 6) {
       setError('OTP কোড ৬ সংখ্যার হতে হবে');
       return;
     }
@@ -61,7 +61,7 @@ export function LoginModal({ onClose, onSuccess }: LoginModalProps) {
     try {
       const res = await api.post<AuthResponse>('/auth/otp/verify', {
         phone: fullPhone,
-        code: otp,
+        code,
       });
 
       if (res.success && res.data) {
@@ -82,8 +82,7 @@ export function LoginModal({ onClose, onSuccess }: LoginModalProps) {
     const digits = value.replace(/\D/g, '').slice(0, 6);
     setOtp(digits);
     if (digits.length === 6) {
-      // auto-submit when 6 digits entered
-      handleVerifyOtp();
+      handleVerifyOtp(digits);
     }
   }
 
