@@ -6,9 +6,12 @@ interface AuthState {
   user: User | null;
   tokens: AuthTokens | null;
   isAuthenticated: boolean;
+  loginModalOpen: boolean;
   setAuth: (user: User, tokens: AuthTokens) => void;
   clearAuth: () => void;
   updateUser: (user: Partial<User>) => void;
+  openLoginModal: () => void;
+  closeLoginModal: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -17,6 +20,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       tokens: null,
       isAuthenticated: false,
+      loginModalOpen: false,
 
       setAuth: (user, tokens) =>
         set({
@@ -36,6 +40,9 @@ export const useAuthStore = create<AuthState>()(
         set((state) => ({
           user: state.user ? { ...state.user, ...updates } : null,
         })),
+
+      openLoginModal: () => set({ loginModalOpen: true }),
+      closeLoginModal: () => set({ loginModalOpen: false }),
     }),
     {
       name: 'review-ratings-auth',

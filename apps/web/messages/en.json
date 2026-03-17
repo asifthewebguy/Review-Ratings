@@ -20,6 +20,7 @@
     "delete": "Delete",
     "viewAll": "View All",
     "noResults": "No results found",
+    "verification": "Profile & Verification",
     "errors": {
       "notFound": "Page not found",
       "serverError": "Server error",

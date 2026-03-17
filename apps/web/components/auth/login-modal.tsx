@@ -2,87 +2,56 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useAuthStore } from '@/lib/store';
 import { api } from '@/lib/api';
+import {
+  signInWithProvider,
+  googleProvider,
+  appleProvider,
+  facebookProvider,
+  twitterProvider,
+  githubProvider,
+} from '@/lib/firebase';
 import type { AuthResponse } from '@review-ratings/shared';
-
-type Step = 'phone' | 'otp';
 
 interface LoginModalProps {
   onClose: () => void;
   onSuccess?: () => void;
 }
 
+const PROVIDERS = [
+  { id: 'google', label: 'Google', provider: googleProvider, icon: '🔵' },
+  { id: 'facebook', label: 'Facebook', provider: facebookProvider, icon: '🟦' },
+  { id: 'apple', label: 'Apple', provider: appleProvider, icon: '🍎' },
+  { id: 'twitter', label: 'X (Twitter)', provider: twitterProvider, icon: '🐦' },
+  { id: 'github', label: 'GitHub', provider: githubProvider, icon: '🐙' },
+] as const;
+
 export function LoginModal({ onClose, onSuccess }: LoginModalProps) {
   const t = useTranslations('auth');
-  const tCommon = useTranslations('common');
   const setAuth = useAuthStore((s) => s.setAuth);
 
-  const [step, setStep] = useState<Step>('phone');
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [error, setError] = useState('');
 
-  const fullPhone = `+880${phone.replace(/^0/, '')}`;
-
-  async function handleRequestOtp() {
+  async function handleSocialLogin(providerId: string, provider: typeof PROVIDERS[number]['provider']) {
     setError('');
-    if (!phone || phone.replace(/\D/g, '').length < 10) {
-      setError('অনুগ্রহ করে সঠিক ফোন নম্বর দিন');
-      return;
-    }
-
-    setLoading(true);
+    setLoadingProvider(providerId);
     try {
-      const res = await api.post('/auth/otp/request', { phone: fullPhone });
-      if (res.success) {
-        setStep('otp');
-      } else {
-        setError(res.error?.message ?? 'কিছু একটা সমস্যা হয়েছে');
-      }
-    } catch {
-      setError('নেটওয়ার্ক ত্রুটি। আবার চেষ্টা করুন।');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleVerifyOtp(code = otp) {
-    setError('');
-    if (code.length !== 6) {
-      setError('OTP কোড ৬ সংখ্যার হতে হবে');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const res = await api.post<AuthResponse>('/auth/otp/verify', {
-        phone: fullPhone,
-        code,
-      });
-
+      const idToken = await signInWithProvider(provider);
+      const res = await api.post<AuthResponse>('/auth/firebase/verify', { idToken });
       if (res.success && res.data) {
         setAuth(res.data.user, res.data.tokens);
         onSuccess?.();
         onClose();
       } else {
-        setError(res.error?.message ?? 'OTP যাচাই ব্যর্থ হয়েছে');
+        setError(res.error?.message ?? 'লগইন ব্যর্থ হয়েছে');
       }
-    } catch {
-      setError('নেটওয়ার্ক ত্রুটি। আবার চেষ্টা করুন।');
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message.includes('popup-closed')) return;
+      setError('লগইন করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
     } finally {
-      setLoading(false);
-    }
-  }
-
-  function handleOtpChange(value: string) {
-    const digits = value.replace(/\D/g, '').slice(0, 6);
-    setOtp(digits);
-    if (digits.length === 6) {
-      handleVerifyOtp(digits);
+      setLoadingProvider(null);
     }
   }
 
@@ -102,63 +71,29 @@ export function LoginModal({ onClose, onSuccess }: LoginModalProps) {
         </button>
 
         <h2 className="text-xl font-bold mb-1">{t('loginTitle')}</h2>
-        <p className="text-sm text-muted-foreground mb-6">
-          {step === 'phone' ? t('loginSubtitle') : t('otpSent')}
-        </p>
+        <p className="text-sm text-muted-foreground mb-6">{t('loginSubtitle')}</p>
 
-        {step === 'phone' ? (
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium">{t('phoneNumber')}</label>
-              <div className="flex">
-                <span className="flex items-center rounded-l-lg border border-r-0 border-border bg-muted px-3 text-sm text-muted-foreground">
-                  +880
-                </span>
-                <input
-                  type="tel"
-                  placeholder="01XXXXXXXXX"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                  className="flex-1 rounded-r-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  maxLength={11}
-                  autoFocus
-                  onKeyDown={(e) => e.key === 'Enter' && handleRequestOtp()}
-                />
-              </div>
-            </div>
-
-            {error && <p className="text-xs text-destructive">{error}</p>}
-
-            <Button onClick={handleRequestOtp} loading={loading} size="lg" className="w-full">
-              {t('verifyOtp')} →
-            </Button>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-4">
-            <Input
-              label={t('enterOtp')}
-              type="tel"
-              value={otp}
-              onChange={(e) => handleOtpChange(e.target.value)}
-              placeholder="000000"
-              maxLength={6}
-              className="text-center text-2xl tracking-widest"
-              autoFocus
-              error={error}
-            />
-
-            <Button onClick={() => handleVerifyOtp()} loading={loading} size="lg" className="w-full">
-              {t('verifyOtp')}
-            </Button>
-
+        <div className="flex flex-col gap-3">
+          {PROVIDERS.map(({ id, label, provider, icon }) => (
             <button
-              onClick={() => { setStep('phone'); setOtp(''); setError(''); }}
-              className="text-sm text-muted-foreground hover:text-foreground text-center"
+              key={id}
+              onClick={() => handleSocialLogin(id, provider)}
+              disabled={loadingProvider !== null}
+              className="flex items-center gap-3 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-muted transition-colors disabled:opacity-60"
             >
-              ← {tCommon('cancel')}
+              <span className="text-lg w-6 text-center">{icon}</span>
+              <span className="flex-1 text-left">
+                {loadingProvider === id ? '...' : label} দিয়ে লগইন করুন
+              </span>
             </button>
-          </div>
-        )}
+          ))}
+        </div>
+
+        {error && <p className="mt-4 text-xs text-destructive text-center">{error}</p>}
+
+        <p className="mt-6 text-xs text-muted-foreground text-center">
+          লগইন করলে আমাদের শর্তাবলী ও গোপনীয়তা নীতিতে সম্মতি প্রদান করা হয়।
+        </p>
       </div>
     </div>
   );

@@ -5,6 +5,8 @@ import rateLimit from '@fastify/rate-limit';
 import { prismaPlugin } from './plugins/prisma.js';
 import { redisPlugin } from './plugins/redis.js';
 import { jwtPlugin } from './plugins/jwt.js';
+import { mailerPlugin } from './plugins/mailer.js';
+import { firebaseAdminPlugin } from './plugins/firebase-admin.js';
 import meiliSearchPlugin from './plugins/meilisearch.js';
 import { healthRoutes } from './routes/health.js';
 import { authRoutes } from './routes/auth/index.js';
@@ -26,6 +28,7 @@ export async function buildApp() {
           ? { target: 'pino-pretty', options: { colorize: true } }
           : undefined,
     },
+    bodyLimit: 20 * 1024 * 1024, // 20MB — accommodates two base64-encoded NID images
   });
 
   // ── Security & CORS ────────────────────────────────────
@@ -47,7 +50,9 @@ export async function buildApp() {
   await app.register(prismaPlugin);
   await app.register(redisPlugin);
   await app.register(jwtPlugin);
+  await app.register(mailerPlugin);
   await app.register(meiliSearchPlugin);
+  await app.register(firebaseAdminPlugin);
 
   // ── Routes ─────────────────────────────────────────────
   await app.register(healthRoutes, { prefix: '/api/v1' });

@@ -20,6 +20,7 @@
     "delete": "মুছুন",
     "viewAll": "সব দেখুন",
     "noResults": "কোনো ফলাফল পাওয়া যায়নি",
+    "verification": "প্রোফাইল ও যাচাই",
     "errors": {
       "notFound": "পৃষ্ঠাটি পাওয়া যায়নি",
       "serverError": "সার্ভার ত্রুটি",

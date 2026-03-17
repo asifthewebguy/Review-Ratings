@@ -2,8 +2,8 @@ import type { z } from 'zod';
 import type {
   UserSchema,
   UserRoleSchema,
-  OtpRequestSchema,
-  OtpVerifySchema,
+  FirebaseVerifySchema,
+  PhoneVerifySchema,
   TokenRefreshSchema,
   ReviewSubmitSchema,
   ReviewEditSchema,
@@ -16,13 +16,19 @@ import type {
   ClaimDocTypeSchema,
   PaginationParamsSchema,
   ErrorCodeSchema,
+  EmailVerifyRequestSchema,
+  EmailVerifyConfirmSchema,
+  NidSubmitSchema,
+  NidUploadUrlSchema,
+  AdminNidDecisionSchema,
+  NidStatusSchema,
 } from '../schemas/index.js';
 
 // ── Inferred Types ─────────────────────────────────────────
 export type User = z.infer<typeof UserSchema>;
 export type UserRole = z.infer<typeof UserRoleSchema>;
-export type OtpRequest = z.infer<typeof OtpRequestSchema>;
-export type OtpVerify = z.infer<typeof OtpVerifySchema>;
+export type FirebaseVerify = z.infer<typeof FirebaseVerifySchema>;
+export type PhoneVerify = z.infer<typeof PhoneVerifySchema>;
 export type TokenRefresh = z.infer<typeof TokenRefreshSchema>;
 export type ReviewSubmit = z.infer<typeof ReviewSubmitSchema>;
 export type ReviewEdit = z.infer<typeof ReviewEditSchema>;
@@ -35,6 +41,12 @@ export type ClaimSubmit = z.infer<typeof ClaimSubmitSchema>;
 export type ClaimDocType = z.infer<typeof ClaimDocTypeSchema>;
 export type PaginationParams = z.infer<typeof PaginationParamsSchema>;
 export type ErrorCodeValue = z.infer<typeof ErrorCodeSchema>;
+export type EmailVerifyRequest = z.infer<typeof EmailVerifyRequestSchema>;
+export type EmailVerifyConfirm = z.infer<typeof EmailVerifyConfirmSchema>;
+export type NidSubmit = z.infer<typeof NidSubmitSchema>;
+export type NidUploadUrl = z.infer<typeof NidUploadUrlSchema>;
+export type AdminNidDecision = z.infer<typeof AdminNidDecisionSchema>;
+export type NidStatus = z.infer<typeof NidStatusSchema>;
 
 // ── API Response Types ─────────────────────────────────────
 export interface ApiResponse<T = unknown> {

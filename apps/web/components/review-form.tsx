@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { StarRating } from '@/components/ui/star-rating';
 import { useAuthStore } from '@/lib/store';
@@ -20,7 +21,8 @@ export function ReviewForm({
   onSuccess,
   onLoginRequired,
 }: ReviewFormProps) {
-  const { isAuthenticated, tokens } = useAuthStore();
+  const router = useRouter();
+  const { isAuthenticated, tokens, user, openLoginModal } = useAuthStore();
   const t = useTranslations('review');
   const [rating, setRating] = useState(0);
   const [body, setBody] = useState('');
@@ -31,7 +33,17 @@ export function ReviewForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isAuthenticated) {
-      onLoginRequired?.();
+      openLoginModal();
+      return;
+    }
+
+    if (!user?.emailVerifiedAt || user?.nidStatus !== 'approved') {
+      setError(
+        locale === 'bn'
+          ? 'রিভিউ জমা দিতে ইমেইল ও জাতীয় পরিচয়পত্র (NID) যাচাই করুন'
+          : 'Please verify your email and National ID before submitting a review',
+      );
+      router.push(`/${locale}/profile`);
       return;
     }
     if (rating === 0) {
@@ -65,6 +77,7 @@ export function ReviewForm({
         return;
       }
       setSuccess(true);
+      router.refresh();
       onSuccess?.();
     } catch {
       setError(locale === 'bn' ? 'সংযোগ ত্রুটি' : 'Connection error');

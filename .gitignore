@@ -38,3 +38,5 @@ meilidata/
 # Misc
 *.log
 *.tsbuildinfo
+*.traineddata
+data.txt

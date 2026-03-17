@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/store';
 
@@ -15,11 +15,11 @@ export function UserManagement({ locale }: { locale: string }) {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const isBn = locale === 'bn';
 
-  async function search() {
-    if (!phone.trim()) return;
+  async function search(phoneFilter = phone) {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/admin/users?phone=${encodeURIComponent(phone)}`, {
+      const params = phoneFilter.trim() ? `?phone=${encodeURIComponent(phoneFilter)}` : '';
+      const res = await fetch(`${API_URL}/admin/users${params}`, {
         headers: { Authorization: `Bearer ${tokens?.accessToken}` },
       });
       const data = await res.json();
@@ -28,6 +28,8 @@ export function UserManagement({ locale }: { locale: string }) {
       setLoading(false);
     }
   }
+
+  useEffect(() => { search(''); }, []);
 
   async function toggleActive(userId: string, isActive: boolean) {
     setActionLoading(userId);
@@ -115,7 +117,7 @@ export function UserManagement({ locale }: { locale: string }) {
         </div>
       )}
 
-      {users.length === 0 && phone && !loading && (
+      {users.length === 0 && !loading && (
         <p className="text-center text-muted-foreground py-6 text-sm">{isBn ? 'কোনো ব্যবহারকারী পাওয়া যায়নি' : 'No users found'}</p>
       )}
     </div>

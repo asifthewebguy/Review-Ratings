@@ -15,8 +15,7 @@ interface HeaderProps {
 export function Header({ locale }: HeaderProps) {
   const t = useTranslations('common');
   const pathname = usePathname();
-  const { user, isAuthenticated, clearAuth } = useAuthStore();
-  const [showLogin, setShowLogin] = useState(false);
+  const { user, isAuthenticated, clearAuth, loginModalOpen, openLoginModal, closeLoginModal } = useAuthStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const otherLocale = locale === 'bn' ? 'en' : 'bn';
@@ -91,7 +90,7 @@ export function Header({ locale }: HeaderProps) {
                 )}
               </div>
             ) : (
-              <Button onClick={() => setShowLogin(true)} size="sm">
+              <Button onClick={openLoginModal} size="sm">
                 {t('login')}
               </Button>
             )}
@@ -99,7 +98,7 @@ export function Header({ locale }: HeaderProps) {
         </div>
       </header>
 
-      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+      {loginModalOpen && <LoginModal onClose={closeLoginModal} />}
     </>
   );
 }

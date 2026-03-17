@@ -14,12 +14,12 @@ interface ClaimButtonProps {
 
 export function ClaimButton({ businessId, businessName, locale, onLoginRequired }: ClaimButtonProps) {
   const t = useTranslations('claim');
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, openLoginModal } = useAuthStore();
   const [showModal, setShowModal] = useState(false);
 
   function handleClick() {
     if (!isAuthenticated) {
-      onLoginRequired?.();
+      openLoginModal();
       return;
     }
     setShowModal(true);

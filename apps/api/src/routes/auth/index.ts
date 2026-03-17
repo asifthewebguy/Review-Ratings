@@ -1,7 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { OtpService } from '../../services/otp.service.js';
-import { createSmsProvider, buildOtpMessage } from '../../lib/sms.js';
-import { OtpRequestSchema, OtpVerifySchema } from '@review-ratings/shared';
+import { FirebaseVerifySchema } from '@review-ratings/shared';
 
 const REFRESH_TOKEN_TTL = 30 * 24 * 60 * 60; // 30 days in seconds
 
@@ -15,13 +13,28 @@ function generateDisplayName(): string {
   return `${adj[Math.floor(Math.random() * adj.length)]} ব্যবহারকারী ${num}`;
 }
 
+const USER_SELECT = {
+  id: true,
+  firebaseUid: true,
+  phone: true,
+  displayName: true,
+  avatarUrl: true,
+  trustLevel: true,
+  role: true,
+  email: true,
+  emailVerifiedAt: true,
+  nidStatus: true,
+  nidVerifiedAt: true,
+  nidRejectedReason: true,
+  verifiedAt: true,
+  createdAt: true,
+} as const;
+
 export async function authRoutes(app: FastifyInstance) {
-  const otpService = new OtpService(app.redis);
-  const sms = createSmsProvider();
-
-  // POST /api/v1/auth/otp/request
-  app.post('/otp/request', async (request, reply) => {
-    const result = OtpRequestSchema.safeParse(request.body);
+  // POST /api/v1/auth/firebase/verify
+  // Exchange a Firebase ID token (from any social provider) for a custom JWT
+  app.post('/firebase/verify', async (request, reply) => {
+    const result = FirebaseVerifySchema.safeParse(request.body);
     if (!result.success) {
       return reply.status(400).send({
         success: false,
@@ -29,71 +42,61 @@ export async function authRoutes(app: FastifyInstance) {
       });
     }
 
-    const { phone } = result.data;
+    const { idToken } = result.data;
 
-    const { allowed } = await otpService.checkRateLimit(phone);
-    if (!allowed) {
-      return reply.status(429).send({
-        success: false,
-        error: { code: 'OTP_RATE_LIMITED', message: 'Too many OTP requests. Try again in 1 hour.' },
-      });
-    }
-
-    const code = await otpService.create(phone);
-
-    // Store audit record
-    await app.prisma.otpAttempt.create({
-      data: {
-        phone,
-        codeHash: code, // Note: in production this should store the hash, not plaintext
-        purpose: 'login',
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      },
-    });
-
-    await sms.send(phone, buildOtpMessage(code));
-
-    return reply.status(200).send({
-      success: true,
-      data: { message: 'OTP sent successfully' },
-    });
-  });
-
-  // POST /api/v1/auth/otp/verify
-  app.post('/otp/verify', async (request, reply) => {
-    const result = OtpVerifySchema.safeParse(request.body);
-    if (!result.success) {
-      return reply.status(400).send({
-        success: false,
-        error: { code: 'VALIDATION_ERROR', message: result.error.issues[0]?.message ?? 'Invalid input' },
-      });
-    }
-
-    const { phone, code } = result.data;
-
-    const valid = await otpService.verify(phone, code);
-    if (!valid) {
+    let decoded: { uid: string; email?: string; name?: string; picture?: string; email_verified?: boolean };
+    try {
+      decoded = await app.firebaseAdmin.verifyIdToken(idToken);
+    } catch {
       return reply.status(401).send({
         success: false,
-        error: { code: 'OTP_INVALID', message: 'Invalid or expired OTP code' },
+        error: { code: 'AUTH_REQUIRED', message: 'Invalid or expired Firebase token' },
       });
     }
 
-    // Upsert user — create if first login
-    const user = await app.prisma.user.upsert({
-      where: { phone },
-      update: { verifiedAt: new Date() },
-      create: {
-        phone,
-        displayName: generateDisplayName(),
-        verifiedAt: new Date(),
-      },
+    const { uid, email, name, picture, email_verified } = decoded;
+
+    // Upsert user — match by firebaseUid first, then email (to merge existing accounts)
+    let user = await app.prisma.user.findFirst({
+      where: { OR: [{ firebaseUid: uid }, ...(email ? [{ email }] : [])] },
+      select: USER_SELECT,
     });
+
+    if (user) {
+      // Update firebaseUid and profile info if not already set
+      user = await app.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          firebaseUid: uid,
+          ...(email && !user.email ? { email } : {}),
+          ...(email && email_verified && !user.emailVerifiedAt ? { emailVerifiedAt: new Date() } : {}),
+          ...(picture && !user.avatarUrl ? { avatarUrl: picture } : {}),
+          ...(name && user.displayName.startsWith('সৎ ব্যবহারকারী') ||
+          user.displayName.startsWith('বিশ্বস্ত ব্যবহারকারী') ||
+          user.displayName.startsWith('সক্রিয় ব্যবহারকারী') ||
+          user.displayName.startsWith('নতুন ব্যবহারকারী')
+            ? { displayName: name }
+            : {}),
+        },
+        select: USER_SELECT,
+      });
+    } else {
+      user = await app.prisma.user.create({
+        data: {
+          firebaseUid: uid,
+          displayName: name ?? generateDisplayName(),
+          email: email ?? null,
+          avatarUrl: picture ?? null,
+          ...(email && email_verified ? { emailVerifiedAt: new Date() } : {}),
+        },
+        select: USER_SELECT,
+      });
+    }
 
     // Issue JWT access token
     const accessToken = app.jwt.sign({
       sub: user.id,
-      phone: user.phone,
+      phone: user.phone ?? '',
       role: user.role,
       trustLevel: user.trustLevel,
     });
@@ -103,7 +106,7 @@ export async function authRoutes(app: FastifyInstance) {
     await app.redis.setex(
       refreshTokenKey(refreshToken),
       REFRESH_TOKEN_TTL,
-      JSON.stringify({ userId: user.id, phone: user.phone, role: user.role }),
+      JSON.stringify({ userId: user.id, phone: user.phone ?? null, role: user.role }),
     );
 
     return reply.status(200).send({
@@ -111,17 +114,23 @@ export async function authRoutes(app: FastifyInstance) {
       data: {
         user: {
           id: user.id,
-          phone: user.phone,
+          phone: user.phone ?? null,
           displayName: user.displayName,
-          avatarUrl: user.avatarUrl,
+          avatarUrl: user.avatarUrl ?? null,
           trustLevel: user.trustLevel,
           role: user.role,
+          email: user.email ?? null,
+          emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
+          nidStatus: user.nidStatus,
+          nidVerifiedAt: user.nidVerifiedAt?.toISOString() ?? null,
+          nidRejectedReason: user.nidRejectedReason ?? null,
+          verifiedAt: user.verifiedAt?.toISOString() ?? null,
           createdAt: user.createdAt.toISOString(),
         },
         tokens: {
           accessToken,
           refreshToken,
-          expiresIn: 15 * 60, // 15 minutes in seconds
+          expiresIn: 15 * 60,
         },
       },
     });
@@ -149,7 +158,7 @@ export async function authRoutes(app: FastifyInstance) {
 
     const { userId, phone, role } = JSON.parse(data) as {
       userId: string;
-      phone: string;
+      phone: string | null;
       role: string;
     };
 
@@ -172,7 +181,7 @@ export async function authRoutes(app: FastifyInstance) {
 
     const accessToken = app.jwt.sign({
       sub: userId,
-      phone,
+      phone: phone ?? '',
       role,
       trustLevel: user.trustLevel,
     });

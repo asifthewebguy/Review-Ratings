@@ -12,23 +12,41 @@ datasource db {
 // ──────────────────────────────────────────────────────────
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  phone         String    @unique @db.VarChar(15)
+  firebaseUid   String?   @unique @map("firebase_uid") @db.VarChar(128)
+  phone         String?   @unique @db.VarChar(15)
   displayName   String    @map("display_name") @db.VarChar(50)
   avatarUrl     String?   @map("avatar_url")
   role          String    @default("user") @db.VarChar(20) // user | business_owner | moderator | admin
   trustLevel    Int       @default(0) @map("trust_level") @db.SmallInt // 0=New, 1=Active, 2=Trusted, 3=Top
   reviewerScore Int       @default(0) @map("reviewer_score")
-  isActive      Boolean   @default(true) @map("is_active")
-  verifiedAt    DateTime? @map("verified_at") @db.Timestamptz()
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  isActive           Boolean   @default(true) @map("is_active")
+  verifiedAt         DateTime? @map("verified_at") @db.Timestamptz()
+  email              String?   @unique @db.VarChar(255)
+  emailVerifiedAt    DateTime? @map("email_verified_at") @db.Timestamptz()
+  nidNumber          String?   @map("nid_number") @db.VarChar(20)
+  nidDocUrl          String?   @map("nid_doc_url")
+  nidDocUrlBack      String?   @map("nid_doc_url_back")
+  nidStatus          String    @default("none") @map("nid_status") @db.VarChar(20) // none | pending | approved | rejected
+  nidVerifiedAt      DateTime? @map("nid_verified_at") @db.Timestamptz()
+  nidRejectedReason  String?   @map("nid_rejected_reason")
+  nidReviewedBy      String?   @map("nid_reviewed_by") @db.Uuid
+  nidReviewedAt      DateTime? @map("nid_reviewed_at") @db.Timestamptz()
+  nidExtractedName   String?   @map("nid_extracted_name")
+  nidExtractedDob    String?   @map("nid_extracted_dob") @db.VarChar(20)
+  nidExtractedAddress String?  @map("nid_extracted_address")
+  nidExtractedFather  String?  @map("nid_extracted_father")
+  nidExtractedMother  String?  @map("nid_extracted_mother")
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  reviews          Review[]
-  flags            Flag[]         @relation("FlagReporter")
-  resolvedFlags    Flag[]         @relation("FlagResolver")
-  claimedBusinesses Business[]    @relation("ClaimedBy")
-  claims           Claim[]        @relation("Claimant")
-  reviewedClaims   Claim[]        @relation("ClaimReviewer")
+  reviews           Review[]
+  flags             Flag[]         @relation("FlagReporter")
+  resolvedFlags     Flag[]         @relation("FlagResolver")
+  claimedBusinesses Business[]     @relation("ClaimedBy")
+  claims            Claim[]        @relation("Claimant")
+  reviewedClaims    Claim[]        @relation("ClaimReviewer")
+  reviewedNids      User[]         @relation("NidReviewer")
+  nidReviewer       User?          @relation("NidReviewer", fields: [nidReviewedBy], references: [id])
 
   @@map("users")
 }

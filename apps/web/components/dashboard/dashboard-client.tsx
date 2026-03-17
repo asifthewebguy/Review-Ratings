@@ -8,7 +8,7 @@ import { RatingTrend } from '@/components/dashboard/rating-trend';
 import { ProfileEdit } from '@/components/dashboard/profile-edit';
 import { ReviewCard } from '@/components/review-card';
 import { ResponseForm } from '@/components/response-form';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 
 const API_URL = '/api/v1';
 
@@ -18,7 +18,8 @@ interface DashboardClientProps {
 
 export function DashboardClient({ locale }: DashboardClientProps) {
   const t = useTranslations('dashboard');
-  const { isAuthenticated, tokens } = useAuthStore();
+  const { isAuthenticated, tokens, user } = useAuthStore();
+  const router = useRouter();
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [selectedBusiness, setSelectedBusiness] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
@@ -28,14 +29,20 @@ export function DashboardClient({ locale }: DashboardClientProps) {
 
   const isBn = locale === 'bn';
 
+  const isVerified = Boolean(user?.phone && user?.nidStatus === 'approved');
+
   useEffect(() => {
     if (!isAuthenticated || !tokens?.accessToken) {
       setLoading(false);
       return;
     }
+    if (!isVerified) {
+      router.replace('/profile');
+      return;
+    }
     fetchBusinesses();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, tokens]);
+  }, [isAuthenticated, tokens, isVerified]);
 
   async function authFetch(url: string) {
     return fetch(url, { headers: { Authorization: `Bearer ${tokens?.accessToken}` } });

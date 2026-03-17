@@ -222,6 +222,85 @@ export async function adminRoutes(app: FastifyInstance) {
     return reply.send({ success: true, data: users, meta: { total, page, limit } });
   });
 
+  // ── NID VERIFICATION QUEUE ────────────────────────────
+
+  // GET /admin/nid-queue — list users by NID verification status
+  app.get('/nid-queue', { preHandler: [app.authenticate, app.requireRole('moderator')] }, async (request, reply) => {
+    const query = request.query as any;
+    const status = query.status ?? 'pending';
+    const page = parseInt(query.page ?? '1', 10);
+    const limit = Math.min(parseInt(query.limit ?? '20', 10), 50);
+
+    const [users, total] = await Promise.all([
+      app.prisma.user.findMany({
+        where: { nidStatus: status },
+        select: {
+          id: true, displayName: true, phone: true, email: true,
+          nidNumber: true, nidDocUrl: true, nidDocUrlBack: true,
+          nidStatus: true, nidVerifiedAt: true, nidRejectedReason: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: 'asc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      app.prisma.user.count({ where: { nidStatus: status } }),
+    ]);
+
+    return reply.send({ success: true, data: users, meta: { total, page, limit } });
+  });
+
+  // PATCH /admin/users/:id/nid — approve or reject NID verification
+  app.patch('/users/:id/nid', { preHandler: [app.authenticate, app.requireRole('moderator')] }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const body = request.body as any;
+    const reviewerId = request.user.sub;
+
+    if (!['approved', 'rejected'].includes(body.status)) {
+      return reply.code(422).send({ success: false, error: { code: 'VALIDATION_ERROR', message: 'status must be approved or rejected' } });
+    }
+
+    if (body.status === 'rejected' && !body.rejectedReason) {
+      return reply.code(422).send({ success: false, error: { code: 'VALIDATION_ERROR', message: 'rejectedReason is required when rejecting' } });
+    }
+
+    const user = await app.prisma.user.findUnique({ where: { id }, select: { nidStatus: true, email: true } });
+    if (!user) {
+      return reply.code(404).send({ success: false, error: { code: 'NOT_FOUND', message: 'User not found' } });
+    }
+    if (user.nidStatus !== 'pending') {
+      return reply.code(409).send({ success: false, error: { code: 'ALREADY_RESOLVED', message: 'NID verification already resolved' } });
+    }
+
+    const updated = await app.prisma.user.update({
+      where: { id },
+      data: {
+        nidStatus: body.status,
+        nidVerifiedAt: body.status === 'approved' ? new Date() : null,
+        nidRejectedReason: body.status === 'rejected' ? body.rejectedReason : null,
+        nidReviewedBy: reviewerId,
+        nidReviewedAt: new Date(),
+      },
+      select: { id: true, displayName: true, phone: true, email: true, nidStatus: true, nidVerifiedAt: true, nidRejectedReason: true },
+    });
+
+    // Notify user by email if available
+    if (user.email) {
+      const from = process.env.SMTP_FROM || 'ReviewBD <noreply@reviewbd.com>';
+      const isApproved = body.status === 'approved';
+      await app.mailer.sendMail({
+        from,
+        to: user.email,
+        subject: isApproved ? 'ReviewBD — NID Verification Approved' : 'ReviewBD — NID Verification Rejected',
+        text: isApproved
+          ? 'Your National ID has been verified. You can now submit reviews on ReviewBD.'
+          : `Your National ID verification was rejected. Reason: ${body.rejectedReason}\n\nPlease resubmit with a clear photo of your NID.`,
+      }).catch((err) => app.log.warn({ err }, 'Failed to send NID decision email'));
+    }
+
+    return reply.send({ success: true, data: updated });
+  });
+
   // PATCH /admin/users/:id — suspend or change role
   app.patch('/users/:id', { preHandler: [app.authenticate, app.requireRole('admin')] }, async (request, reply) => {
     const { id } = request.params as { id: string };
