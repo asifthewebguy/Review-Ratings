@@ -44,6 +44,13 @@ export async function authRoutes(app: FastifyInstance) {
 
     const { idToken } = result.data;
 
+    if (!app.firebaseAdmin) {
+      return reply.status(503).send({
+        success: false,
+        error: { code: 'FIREBASE_NOT_CONFIGURED', message: 'Firebase authentication is not configured on this server' },
+      });
+    }
+
     let decoded: { uid: string; email?: string; name?: string; picture?: string; email_verified?: boolean };
     try {
       decoded = await app.firebaseAdmin.verifyIdToken(idToken);
