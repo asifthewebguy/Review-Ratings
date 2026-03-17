@@ -18,7 +18,7 @@ interface DashboardClientProps {
 
 export function DashboardClient({ locale }: DashboardClientProps) {
   const t = useTranslations('dashboard');
-  const { isAuthenticated, tokens, user } = useAuthStore();
+  const { isAuthenticated, tokens, user, refreshAccessToken } = useAuthStore();
   const router = useRouter();
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [selectedBusiness, setSelectedBusiness] = useState<any>(null);
@@ -45,7 +45,14 @@ export function DashboardClient({ locale }: DashboardClientProps) {
   }, [isAuthenticated, tokens, isVerified]);
 
   async function authFetch(url: string) {
-    return fetch(url, { headers: { Authorization: `Bearer ${tokens?.accessToken}` } });
+    const tok = () => useAuthStore.getState().tokens?.accessToken;
+    let res = await fetch(url, { headers: { Authorization: `Bearer ${tok()}` } });
+    if (res.status === 401) {
+      const ok = await refreshAccessToken();
+      if (!ok) { router.replace('/'); return res; }
+      res = await fetch(url, { headers: { Authorization: `Bearer ${tok()}` } });
+    }
+    return res;
   }
 
   async function fetchBusinesses() {

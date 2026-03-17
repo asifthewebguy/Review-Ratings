@@ -11,7 +11,7 @@ const API_URL = '';
 type NidStatus = 'none' | 'pending' | 'approved' | 'rejected';
 
 export function VerificationSection({ locale }: { locale: string }) {
-  const { tokens, updateUser, user: storeUser, isAuthenticated } = useAuthStore();
+  const { tokens, updateUser, user: storeUser, isAuthenticated, refreshAccessToken } = useAuthStore();
   const router = useRouter();
   const isBn = locale === 'bn';
 
@@ -50,16 +50,29 @@ export function VerificationSection({ locale }: { locale: string }) {
   const [nidLoading, setNidLoading] = useState(false);
   const [nidError, setNidError] = useState('');
 
-  function authHeaders() {
+  function getAuthHeaders() {
+    const tok = useAuthStore.getState().tokens?.accessToken;
     return {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${tokens?.accessToken}`,
+      Authorization: `Bearer ${tok}`,
     };
+  }
+
+  async function authFetch(url: string, opts: RequestInit = {}): Promise<Response> {
+    const res = await fetch(url, { ...opts, headers: { ...getAuthHeaders(), ...(opts.headers as Record<string, string> ?? {}) } });
+    if (res.status === 401) {
+      const ok = await refreshAccessToken();
+      if (ok) {
+        return fetch(url, { ...opts, headers: { ...getAuthHeaders(), ...(opts.headers as Record<string, string> ?? {}) } });
+      }
+      router.replace('/');
+    }
+    return res;
   }
 
   useEffect(() => {
     if (!isAuthenticated || !tokens?.accessToken) { router.replace('/'); setLoading(false); return; }
-    fetch(`${API_URL}/api/v1/users/me`, { headers: authHeaders() })
+    authFetch(`${API_URL}/api/v1/users/me`)
       .then((r) => r.json())
       .then((res) => {
         if (res.success) {
@@ -107,9 +120,8 @@ export function VerificationSection({ locale }: { locale: string }) {
     setPhoneLoading(true);
     try {
       const idToken = await confirmPhoneOtp(confirmationRef.current, phoneOtp);
-      const res = await fetch(`${API_URL}/api/v1/users/me/verify/phone`, {
+      const res = await authFetch(`${API_URL}/api/v1/users/me/verify/phone`, {
         method: 'POST',
-        headers: authHeaders(),
         body: JSON.stringify({ idToken }),
       }).then((r) => r.json());
       if (res.success) {
@@ -136,9 +148,8 @@ export function VerificationSection({ locale }: { locale: string }) {
     }
     setEmailLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/v1/users/me/verify/email/request`, {
+      const res = await authFetch(`${API_URL}/api/v1/users/me/verify/email/request`, {
         method: 'POST',
-        headers: authHeaders(),
         body: JSON.stringify({ email }),
       }).then((r) => r.json());
       if (res.success) {
@@ -162,9 +173,8 @@ export function VerificationSection({ locale }: { locale: string }) {
     }
     setEmailLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/v1/users/me/verify/email/confirm`, {
+      const res = await authFetch(`${API_URL}/api/v1/users/me/verify/email/confirm`, {
         method: 'POST',
-        headers: authHeaders(),
         body: JSON.stringify({ email, code: emailCode }),
       }).then((r) => r.json());
       if (res.success) {
@@ -188,9 +198,8 @@ export function VerificationSection({ locale }: { locale: string }) {
     setNidFrontPreview(preview);
     setNidExtracting(true);
     try {
-      const res = await fetch(`${API_URL}/api/v1/users/me/verify/nid/extract`, {
+      const res = await authFetch(`${API_URL}/api/v1/users/me/verify/nid/extract`, {
         method: 'POST',
-        headers: authHeaders(),
         body: JSON.stringify({ imageData: data }),
       }).then((r) => r.json());
       if (res.success) {
@@ -220,9 +229,8 @@ export function VerificationSection({ locale }: { locale: string }) {
     }
     setNidLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/v1/users/me/verify/nid`, {
+      const res = await authFetch(`${API_URL}/api/v1/users/me/verify/nid`, {
         method: 'POST',
-        headers: authHeaders(),
         body: JSON.stringify({
           nidNumber,
           nidDocUrl: nidFrontData,
