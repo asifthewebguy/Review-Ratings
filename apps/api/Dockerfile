@@ -24,6 +24,7 @@ ENV NODE_ENV=production
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/apps/api/prisma ./prisma
 COPY --from=builder /app/node_modules /app/node_modules
+COPY --from=builder /app/packages/shared /app/packages/shared
 COPY --from=builder /app/apps/api/node_modules ./node_modules
 EXPOSE 3001
 CMD ["node", "dist/server.js"]
