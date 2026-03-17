@@ -1,4 +1,6 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
+import { resolve } from 'path';
+config({ path: resolve(process.cwd(), '../../.env') });
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -284,6 +286,21 @@ async function main() {
     }
   }
   console.log(`  ✓ ${categoriesData.length} categories, ${subRatingCount} sub-rating definitions`);
+
+  // ── 5. Seed Admin Account ──────────────────────────────
+  console.log('👤 Seeding admin account...');
+  const adminPhone = process.env.ADMIN_PHONE ?? '+8801000000000';
+  await prisma.user.upsert({
+    where: { phone: adminPhone },
+    update: { role: 'admin' },
+    create: {
+      phone: adminPhone,
+      displayName: 'Platform Admin',
+      role: 'admin',
+      verifiedAt: new Date(),
+    },
+  });
+  console.log(`  ✓ Admin account: ${adminPhone}`);
 
   console.log('\n✅ Seed complete!');
 }

@@ -1,6 +1,6 @@
 import type { ApiResponse } from '@review-ratings/shared';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_BASE_URL = '/api/v1';
 
 class ApiClient {
   private baseUrl: string;

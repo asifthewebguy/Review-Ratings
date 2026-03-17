@@ -1,4 +1,11 @@
-import 'dotenv/config';
+// Load .env file in development only — Docker injects env vars in production
+if (process.env.NODE_ENV !== 'production') {
+  const { config } = await import('dotenv');
+  const { resolve } = await import('path');
+  const { fileURLToPath } = await import('url');
+  const __dirname = fileURLToPath(new URL('.', import.meta.url));
+  config({ path: resolve(__dirname, '../../../.env') });
+}
 import { buildApp } from './app.js';
 import { createIntegrityJobs } from './jobs/integrity.js';
 

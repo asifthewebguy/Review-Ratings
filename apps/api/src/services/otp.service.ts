@@ -22,6 +22,10 @@ export class OtpService {
 
   /** Check if phone has hit rate limit. Returns remaining count. */
   async checkRateLimit(phone: string): Promise<{ allowed: boolean; remaining: number }> {
+    if (process.env.NODE_ENV !== 'production') {
+      return { allowed: true, remaining: RATE_LIMIT_MAX };
+    }
+
     const key = rateLimitKey(phone);
     const count = await this.redis.incr(key);
 

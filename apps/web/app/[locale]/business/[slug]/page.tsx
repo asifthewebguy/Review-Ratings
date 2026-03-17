@@ -5,7 +5,7 @@ import { ReviewFormWrapper } from '@/components/review-form-wrapper';
 import { StarRating, RatingBadge } from '@/components/ui/star-rating';
 import { ClaimButton } from '@/components/claim-button';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}/api/v1`;
 
 async function getBusiness(slug: string) {
   try {

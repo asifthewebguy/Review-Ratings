@@ -15,20 +15,24 @@ export default fp(
       apiKey: process.env.MEILISEARCH_MASTER_KEY,
     });
 
-    // Configure businesses index
-    const index = client.index('businesses');
-    await index.updateSettings({
-      searchableAttributes: [
-        'name',
-        'description',
-        'address',
-        'categoryNameEn',
-        'categoryNameBn',
-      ],
-      filterableAttributes: ['categorySlug', 'districtId', 'divisionId', 'isActive', 'isClaimed'],
-      sortableAttributes: ['reviewCount', 'avgRating', 'trustScore', 'createdAt'],
-      rankingRules: ['words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
-    });
+    // Configure businesses index (non-fatal — MeiliSearch may run without auth in dev)
+    try {
+      const index = client.index('businesses');
+      await index.updateSettings({
+        searchableAttributes: [
+          'name',
+          'description',
+          'address',
+          'categoryNameEn',
+          'categoryNameBn',
+        ],
+        filterableAttributes: ['categorySlug', 'districtId', 'divisionId', 'isActive', 'isClaimed'],
+        sortableAttributes: ['reviewCount', 'avgRating', 'trustScore', 'createdAt'],
+        rankingRules: ['words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
+      });
+    } catch (err) {
+      app.log.warn({ err }, 'MeiliSearch index configuration failed — search may be degraded');
+    }
 
     app.decorate('meilisearch', client);
     app.addHook('onClose', async () => {});
