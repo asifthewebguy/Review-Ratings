@@ -492,6 +492,8 @@ export function VerificationSection({ locale }: { locale: string }) {
             nidExtractedName={nidExtractedName} setNidExtractedName={setNidExtractedName}
             nidExtractedDob={nidExtractedDob} setNidExtractedDob={setNidExtractedDob}
             nidExtractedAddress={nidExtractedAddress} setNidExtractedAddress={setNidExtractedAddress}
+            nidExtractedFather={nidExtractedFather} setNidExtractedFather={setNidExtractedFather}
+            nidExtractedMother={nidExtractedMother} setNidExtractedMother={setNidExtractedMother}
             nidExtracting={nidExtracting}
             nidError={nidError} nidLoading={nidLoading}
             onSubmit={handleNidSubmit}
