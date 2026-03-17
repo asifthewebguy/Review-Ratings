@@ -65,6 +65,8 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://api:3001
     restart: always
     env_file: .env
     environment:
