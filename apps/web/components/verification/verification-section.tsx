@@ -6,7 +6,7 @@ import { useRouter } from '@/i18n/navigation';
 import { sendPhoneOtp, confirmPhoneOtp } from '@/lib/firebase';
 import type { ConfirmationResult } from 'firebase/auth';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const API_URL = '';
 
 type NidStatus = 'none' | 'pending' | 'approved' | 'rejected';
 
