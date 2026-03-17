@@ -64,7 +64,7 @@ export function UserManagement({ locale }: { locale: string }) {
           className="flex-1 rounded-lg border border-border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
         />
         <button
-          onClick={search}
+          onClick={() => search()}
           disabled={loading}
           className="rounded-lg bg-primary px-5 py-2.5 text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
         >
