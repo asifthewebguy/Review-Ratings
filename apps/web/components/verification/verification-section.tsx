@@ -90,7 +90,8 @@ export function VerificationSection({ locale }: { locale: string }) {
       confirmationRef.current = await sendPhoneOtp(fullPhone, 'recaptcha-container');
       setPhoneStep('otp');
       setPhoneSuccess(isBn ? 'SMS-এ OTP কোড পাঠানো হয়েছে' : 'OTP sent via SMS');
-    } catch {
+    } catch (err) {
+      console.error('OTP send error:', err);
       setPhoneError(isBn ? 'OTP পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।' : 'Failed to send OTP. Please try again.');
     } finally {
       setPhoneLoading(false);
