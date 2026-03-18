@@ -23,19 +23,6 @@ model User {
   verifiedAt         DateTime? @map("verified_at") @db.Timestamptz()
   email              String?   @unique @db.VarChar(255)
   emailVerifiedAt    DateTime? @map("email_verified_at") @db.Timestamptz()
-  nidNumber          String?   @map("nid_number") @db.VarChar(20)
-  nidDocUrl          String?   @map("nid_doc_url")
-  nidDocUrlBack      String?   @map("nid_doc_url_back")
-  nidStatus          String    @default("none") @map("nid_status") @db.VarChar(20) // none | pending | approved | rejected
-  nidVerifiedAt      DateTime? @map("nid_verified_at") @db.Timestamptz()
-  nidRejectedReason  String?   @map("nid_rejected_reason")
-  nidReviewedBy      String?   @map("nid_reviewed_by") @db.Uuid
-  nidReviewedAt      DateTime? @map("nid_reviewed_at") @db.Timestamptz()
-  nidExtractedName   String?   @map("nid_extracted_name")
-  nidExtractedDob    String?   @map("nid_extracted_dob") @db.VarChar(20)
-  nidExtractedAddress String?  @map("nid_extracted_address")
-  nidExtractedFather  String?  @map("nid_extracted_father")
-  nidExtractedMother  String?  @map("nid_extracted_mother")
   createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -45,8 +32,8 @@ model User {
   claimedBusinesses Business[]     @relation("ClaimedBy")
   claims            Claim[]        @relation("Claimant")
   reviewedClaims    Claim[]        @relation("ClaimReviewer")
-  reviewedNids      User[]         @relation("NidReviewer")
-  nidReviewer       User?          @relation("NidReviewer", fields: [nidReviewedBy], references: [id])
+  reviewedEdits     ReviewEdit[]   @relation("EditReviewer")
+  reviewReactions   ReviewReaction[]
 
   @@map("users")
 }
@@ -195,16 +182,22 @@ model Review {
   removalReason     String?   @map("removal_reason") @db.VarChar(100)
   flagCount         Int       @default(0) @map("flag_count")
   helpfulCount      Int       @default(0) @map("helpful_count")
+  unhelpfulCount    Int       @default(0) @map("unhelpful_count")
   ipAddress         String?   @map("ip_address") @db.VarChar(45) // IPv4/IPv6
   editedAt          DateTime? @map("edited_at") @db.Timestamptz()
   editLockedAt      DateTime? @map("edit_locked_at") @db.Timestamptz() // 48h after creation
+  originalBody      String?   @map("original_body")
+  originalRating    Int?      @map("original_rating") @db.SmallInt
   createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  business Business  @relation(fields: [businessId], references: [id])
-  user     User      @relation(fields: [userId], references: [id])
-  response Response?
-  flags    Flag[]
+  business  Business         @relation(fields: [businessId], references: [id])
+  user      User             @relation(fields: [userId], references: [id])
+  response  Response?
+  flags     Flag[]
+  edits     ReviewEdit[]
+  reactions ReviewReaction[]
+  updates   ReviewUpdate[]
 
   @@unique([businessId, userId])
   @@index([businessId, status, createdAt(sort: Desc)], map: "idx_reviews_business")
@@ -261,7 +254,7 @@ model Claim {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   businessId      String    @map("business_id") @db.Uuid
   userId          String    @map("user_id") @db.Uuid
-  docType         String    @map("doc_type") @db.VarChar(20) // trade_license | nid
+  docType         String    @map("doc_type") @db.VarChar(20) // trade_license
   docUrl          String    @map("doc_url")
   docUrlBack      String?   @map("doc_url_back")
   status          String    @default("pending") @db.VarChar(20) // pending | approved | rejected
@@ -296,6 +289,59 @@ model Subscription {
   business Business @relation(fields: [businessId], references: [id])
 
   @@map("subscriptions")
+}
+
+// ──────────────────────────────────────────────────────────
+// REVIEW EDITS (pending edits awaiting admin approval)
+// ──────────────────────────────────────────────────────────
+model ReviewEdit {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reviewId   String    @map("review_id") @db.Uuid
+  rating     Int       @db.SmallInt
+  body       String
+  photoUrls  String[]  @map("photo_urls")
+  status     String    @default("pending") @db.VarChar(20) // pending | approved | rejected
+  reviewedBy String?   @map("reviewed_by") @db.Uuid
+  reviewedAt DateTime? @map("reviewed_at") @db.Timestamptz()
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  review   Review @relation(fields: [reviewId], references: [id])
+  reviewer User?  @relation("EditReviewer", fields: [reviewedBy], references: [id])
+
+  @@index([status], map: "idx_review_edits_status")
+  @@map("review_edits")
+}
+
+// ──────────────────────────────────────────────────────────
+// REVIEW REACTIONS (helpful / unhelpful)
+// ──────────────────────────────────────────────────────────
+model ReviewReaction {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reviewId  String   @map("review_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  type      String   @db.VarChar(20) // helpful | unhelpful
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  review Review @relation(fields: [reviewId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([reviewId, userId])
+  @@map("review_reactions")
+}
+
+// ──────────────────────────────────────────────────────────
+// REVIEW UPDATES (author follow-up additions)
+// ──────────────────────────────────────────────────────────
+model ReviewUpdate {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reviewId  String   @map("review_id") @db.Uuid
+  body      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  review Review @relation(fields: [reviewId], references: [id])
+
+  @@index([reviewId], map: "idx_review_updates_review")
+  @@map("review_updates")
 }
 
 // ──────────────────────────────────────────────────────────

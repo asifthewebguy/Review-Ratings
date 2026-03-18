@@ -206,6 +206,8 @@ export async function businessRoutes(app: FastifyInstance) {
           },
           response: true,
           flags: { select: { id: true } },
+          updates: { orderBy: { createdAt: 'asc' } },
+          edits: { where: { status: 'pending' }, select: { id: true }, take: 1 },
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -235,21 +237,21 @@ export async function businessRoutes(app: FastifyInstance) {
       });
     }
 
-    // Require email + NID verification before submitting a review
+    // Require phone + email verification before submitting a review
     const reviewer = await app.prisma.user.findUnique({
       where: { id: userId },
-      select: { emailVerifiedAt: true, nidStatus: true },
+      select: { phone: true, verifiedAt: true, emailVerifiedAt: true },
     });
+    if (!reviewer?.phone || !reviewer?.verifiedAt) {
+      return reply.code(403).send({
+        success: false,
+        error: { code: 'PHONE_NOT_VERIFIED', message: 'Please verify your phone number before submitting a review' },
+      });
+    }
     if (!reviewer?.emailVerifiedAt) {
       return reply.code(403).send({
         success: false,
         error: { code: 'EMAIL_NOT_VERIFIED', message: 'Please verify your email address before submitting a review' },
-      });
-    }
-    if (reviewer.nidStatus !== 'approved') {
-      return reply.code(403).send({
-        success: false,
-        error: { code: 'NID_NOT_VERIFIED', message: 'Please verify your National ID before submitting a review' },
       });
     }
 

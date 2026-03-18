@@ -6,7 +6,7 @@ import { AdminGuard } from '@/components/admin/admin-guard';
 import { AnalyticsPanel } from '@/components/admin/analytics-panel';
 import { FlagQueue } from '@/components/admin/flag-queue';
 import { ClaimQueue } from '@/components/admin/claim-queue';
-import { NidQueue } from '@/components/admin/nid-queue';
+import { EditQueue } from '@/components/admin/edit-queue';
 import { UserManagement } from '@/components/admin/user-management';
 
 interface AdminClientProps {
@@ -15,13 +15,13 @@ interface AdminClientProps {
 
 export function AdminClient({ locale }: AdminClientProps) {
   const t = useTranslations('admin');
-  const [activeTab, setActiveTab] = useState<'analytics' | 'flags' | 'claims' | 'nid' | 'users'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'flags' | 'edits' | 'claims' | 'users'>('analytics');
 
   const tabs = [
     { id: 'analytics' as const, label: t('analytics'), icon: '📊' },
     { id: 'flags' as const, label: t('flags'), icon: '🚩' },
+    { id: 'edits' as const, label: t('editQueue'), icon: '✏️' },
     { id: 'claims' as const, label: t('claims'), icon: '📋' },
-    { id: 'nid' as const, label: locale === 'bn' ? 'NID যাচাই' : 'NID Queue', icon: '🪪' },
     { id: 'users' as const, label: t('users'), icon: '👤' },
   ];
 
@@ -49,8 +49,8 @@ export function AdminClient({ locale }: AdminClientProps) {
 
         {activeTab === 'analytics' && <AnalyticsPanel locale={locale} />}
         {activeTab === 'flags' && <FlagQueue locale={locale} />}
+        {activeTab === 'edits' && <EditQueue locale={locale} />}
         {activeTab === 'claims' && <ClaimQueue locale={locale} />}
-        {activeTab === 'nid' && <NidQueue locale={locale} />}
         {activeTab === 'users' && <UserManagement locale={locale} />}
       </div>
     </AdminGuard>

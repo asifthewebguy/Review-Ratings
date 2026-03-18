@@ -29,8 +29,8 @@ export async function claimRoutes(app: FastifyInstance) {
     }
 
     // Validate required fields
-    if (!body.docType || !['trade_license', 'nid'].includes(body.docType)) {
-      return reply.code(422).send({ success: false, error: { code: 'INVALID_DOC_TYPE', message: 'docType must be trade_license or nid' } });
+    if (!body.docType || body.docType !== 'trade_license') {
+      return reply.code(422).send({ success: false, error: { code: 'INVALID_DOC_TYPE', message: 'docType must be trade_license' } });
     }
     if (!body.docUrl) {
       return reply.code(422).send({ success: false, error: { code: 'MISSING_DOC', message: 'docUrl is required' } });

@@ -18,6 +18,7 @@ interface DashboardClientProps {
 
 export function DashboardClient({ locale }: DashboardClientProps) {
   const t = useTranslations('dashboard');
+  const tb = useTranslations('business');
   const { isAuthenticated, tokens, user, refreshAccessToken } = useAuthStore();
   const router = useRouter();
   const [businesses, setBusinesses] = useState<any[]>([]);
@@ -29,7 +30,7 @@ export function DashboardClient({ locale }: DashboardClientProps) {
 
   const isBn = locale === 'bn';
 
-  const isVerified = Boolean(user?.phone && user?.nidStatus === 'approved');
+  const isVerified = Boolean(user?.phone);
 
   useEffect(() => {
     if (!isAuthenticated || !tokens?.accessToken) {
@@ -111,9 +112,14 @@ export function DashboardClient({ locale }: DashboardClientProps) {
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
         <p className="text-4xl mb-4">🏢</p>
         <h1 className="text-xl font-bold mb-2">{t('noClaimed')}</h1>
-        <Link href="/search" className="mt-4 inline-block rounded-lg bg-primary px-6 py-3 text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
-          {t('claimNow')}
-        </Link>
+        <div className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
+          <Link href="/search" className="inline-block rounded-lg bg-primary px-6 py-3 text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
+            {t('claimNow')}
+          </Link>
+          <Link href="/businesses/new" className="inline-block rounded-lg border border-primary px-6 py-3 text-primary font-medium hover:bg-primary/10 transition-colors">
+            {tb('addBusiness')}
+          </Link>
+        </div>
       </div>
     );
   }

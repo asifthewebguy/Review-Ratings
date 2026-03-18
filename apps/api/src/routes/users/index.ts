@@ -1,6 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { UpdateUserSchema, EmailVerifyRequestSchema, EmailVerifyConfirmSchema, NidSubmitSchema, NidExtractSchema, PhoneVerifySchema } from '@review-ratings/shared';
-import Tesseract from 'tesseract.js';
+import { UpdateUserSchema, EmailVerifyRequestSchema, EmailVerifyConfirmSchema, PhoneVerifySchema } from '@review-ratings/shared';
 import bcrypt from 'bcryptjs';
 
 const EMAIL_OTP_TTL = 10 * 60; // 10 minutes
@@ -22,14 +21,6 @@ const USER_SELECT = {
   role: true,
   email: true,
   emailVerifiedAt: true,
-  nidStatus: true,
-  nidVerifiedAt: true,
-  nidRejectedReason: true,
-  nidExtractedName: true,
-  nidExtractedDob: true,
-  nidExtractedAddress: true,
-  nidExtractedFather: true,
-  nidExtractedMother: true,
   createdAt: true,
   verifiedAt: true,
 } as const;
@@ -246,91 +237,6 @@ export async function userRoutes(app: FastifyInstance) {
     return reply.send({ success: true, data: user });
   });
 
-  // ── NID Verification ────────────────────────────────────
-
-  // POST /users/me/verify/nid/extract — OCR a NID front image and return parsed fields
-  app.post('/me/verify/nid/extract', { preHandler: app.authenticate }, async (request, reply) => {
-    const result = NidExtractSchema.safeParse(request.body);
-    if (!result.success) {
-      return reply.status(400).send({
-        success: false,
-        error: { code: 'VALIDATION_ERROR', message: result.error.issues[0]?.message ?? 'Invalid input' },
-      });
-    }
-
-    const { imageData } = result.data;
-    const base64 = imageData.replace(/^data:image\/\w+;base64,/, '');
-    const buffer = Buffer.from(base64, 'base64');
-
-    try {
-      const { data: { text } } = await Tesseract.recognize(buffer, 'ben+eng');
-return reply.send({ success: true, data: parseNidText(text) });
-    } catch {
-      return reply.status(500).send({
-        success: false,
-        error: { code: 'OCR_FAILED', message: 'Could not process image' },
-      });
-    }
-  });
-
-  // POST /users/me/verify/nid — submit NID documents for admin review
-  app.post('/me/verify/nid', { preHandler: app.authenticate }, async (request, reply) => {
-    const result = NidSubmitSchema.safeParse(request.body);
-    if (!result.success) {
-      return reply.status(400).send({
-        success: false,
-        error: { code: 'VALIDATION_ERROR', message: result.error.issues[0]?.message ?? 'Invalid input' },
-      });
-    }
-
-    const userId = request.user.sub;
-    const { nidNumber, nidDocUrl, nidDocUrlBack, nidExtractedName, nidExtractedDob, nidExtractedAddress, nidExtractedFather, nidExtractedMother } = result.data;
-
-    const current = await app.prisma.user.findUnique({
-      where: { id: userId },
-      select: { nidStatus: true },
-    });
-
-    if (current?.nidStatus === 'approved') {
-      return reply.status(409).send({
-        success: false,
-        error: { code: 'NID_ALREADY_VERIFIED', message: 'National ID is already verified' },
-      });
-    }
-
-    if (current?.nidStatus === 'pending') {
-      return reply.status(409).send({
-        success: false,
-        error: { code: 'NID_REVIEW_PENDING', message: 'Your NID is already under review' },
-      });
-    }
-
-    const duplicate = await app.prisma.user.findFirst({
-      where: { nidNumber, nidStatus: { in: ['pending', 'approved'] }, NOT: { id: userId } },
-      select: { id: true },
-    });
-    if (duplicate) {
-      return reply.status(409).send({
-        success: false,
-        error: { code: 'NID_DUPLICATE', message: 'This NID has already been submitted by another user' },
-      });
-    }
-
-    await app.prisma.user.update({
-      where: { id: userId },
-      data: {
-        nidNumber, nidDocUrl, nidDocUrlBack, nidStatus: 'pending',
-        ...(nidExtractedName ? { nidExtractedName } : {}),
-        ...(nidExtractedDob ? { nidExtractedDob } : {}),
-        ...(nidExtractedAddress ? { nidExtractedAddress } : {}),
-        ...(nidExtractedFather ? { nidExtractedFather } : {}),
-        ...(nidExtractedMother ? { nidExtractedMother } : {}),
-      },
-    });
-
-    return reply.status(201).send({ success: true, data: { nidStatus: 'pending' } });
-  });
-
   // ── Phone Verification (KYC) ────────────────────────────
   // POST /users/me/verify/phone — verify phone via Firebase Phone Auth ID token
   app.post('/me/verify/phone', { preHandler: app.authenticate }, async (request, reply) => {
@@ -373,18 +279,11 @@ return reply.send({ success: true, data: parseNidText(text) });
       });
     }
 
-    const current = await app.prisma.user.findUnique({
-      where: { id: userId },
-      select: { nidStatus: true },
-    });
-
     const user = await app.prisma.user.update({
       where: { id: userId },
       data: {
         phone: phoneNumber,
         verifiedAt: new Date(),
-        // Bump to trustLevel 1 if NID is also approved
-        ...(current?.nidStatus === 'approved' ? { trustLevel: 1 } : {}),
       },
       select: USER_SELECT,
     });
@@ -393,34 +292,3 @@ return reply.send({ success: true, data: parseNidText(text) });
   });
 }
 
-function parseNidText(text: string): {
-  nidNumber: string | null;
-  name: string | null;
-  dob: string | null;
-  address: string | null;
-  father: string | null;
-  mother: string | null;
-} {
-  // NID number: 10 or 17 consecutive digits
-  const nidMatch = text.match(/\b(\d{17}|\d{10})\b/);
-  // DOB: "01 Nov 1987" (Bangladesh NID format) OR DD-MM-YYYY / DD/MM/YYYY
-  const dobMatch = text.match(/\b(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4})\b/i)
-    ?? text.match(/\b(\d{2}[-/]\d{2}[-/]\d{4})\b/);
-  // Name: match Bengali "নাম:" label OR English "Name:" — capture until end of line
-  const nameMatch = text.match(/(?:নাম|Name)[;:\s]+([^\n\r]{2,60})/i);
-  // Address after "Address:" label
-  const addressMatch = text.match(/Address\s*[:\s]+(.{5,120})/i);
-  // Father: পিতা with semicolon OR colon (OCR often reads : as ;)
-  const fatherMatch = text.match(/(?:পিতা|Father)[;:\s]+([^\n\r]{2,80})/i);
-  // Mother: মাতা with semicolon OR colon
-  const motherMatch = text.match(/(?:মাতা|Mother)[;:\s]+([^\n\r]{2,80})/i);
-
-  return {
-    nidNumber: nidMatch?.[1] ?? null,
-    name: nameMatch?.[1]?.trim() ?? null,
-    dob: dobMatch?.[1] ?? null,
-    address: addressMatch?.[1]?.trim() ?? null,
-    father: fatherMatch?.[1]?.trim() ?? null,
-    mother: motherMatch?.[1]?.trim() ?? null,
-  };
-}

@@ -85,14 +85,6 @@ export const UserSchema = z.object({
   email: z.string().email().nullable().optional(),
   emailVerifiedAt: z.string().datetime().nullable().optional(),
   verifiedAt: z.string().datetime().nullable().optional(),
-  nidStatus: z.enum(['none', 'pending', 'approved', 'rejected']).optional(),
-  nidVerifiedAt: z.string().datetime().nullable().optional(),
-  nidRejectedReason: z.string().nullable().optional(),
-  nidExtractedName: z.string().nullable().optional(),
-  nidExtractedDob: z.string().nullable().optional(),
-  nidExtractedAddress: z.string().nullable().optional(),
-  nidExtractedFather: z.string().nullable().optional(),
-  nidExtractedMother: z.string().nullable().optional(),
   createdAt: z.string().datetime(),
 });
 
@@ -155,7 +147,7 @@ export const BusinessResponseSchema = z.object({
 });
 
 // ── Claim ──────────────────────────────────────────────────
-export const ClaimDocTypeSchema = z.enum(['trade_license', 'nid']);
+export const ClaimDocTypeSchema = z.enum(['trade_license']);
 
 export const ClaimSubmitSchema = z.object({
   docType: ClaimDocTypeSchema,
@@ -173,44 +165,30 @@ export const EmailVerifyConfirmSchema = z.object({
   code: z.string().length(6).regex(/^\d{6}$/, 'Code must be 6 digits'),
 });
 
-export const NidSubmitSchema = z.object({
-  nidNumber: z.string().min(10).max(20),
-  nidDocUrl: z.string().min(1),
-  nidDocUrlBack: z.string().min(1).optional(),
-  nidExtractedName: z.string().optional(),
-  nidExtractedDob: z.string().optional(),
-  nidExtractedAddress: z.string().optional(),
-  nidExtractedFather: z.string().optional(),
-  nidExtractedMother: z.string().optional(),
-});
-
-export const NidExtractSchema = z.object({
-  imageData: z.string().min(1),
-});
-
-export const NidUploadUrlSchema = z.object({
-  side: z.enum(['front', 'back']),
-  mimeType: z.string().min(1),
-});
-
-export const AdminNidDecisionSchema = z.object({
-  status: z.enum(['approved', 'rejected']),
-  rejectedReason: z.string().max(500).optional(),
-});
-
-export const NidStatusSchema = z.enum(['none', 'pending', 'approved', 'rejected']);
-
 // ── Error Codes (verification) ─────────────────────────────
 export const VerificationErrorCode = {
   EMAIL_ALREADY_VERIFIED: 'EMAIL_ALREADY_VERIFIED',
   EMAIL_TAKEN: 'EMAIL_TAKEN',
   OTP_EXPIRED: 'OTP_EXPIRED',
-  NID_ALREADY_VERIFIED: 'NID_ALREADY_VERIFIED',
-  NID_REVIEW_PENDING: 'NID_REVIEW_PENDING',
   EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
-  NID_NOT_VERIFIED: 'NID_NOT_VERIFIED',
+  PHONE_NOT_VERIFIED: 'PHONE_NOT_VERIFIED',
   ALREADY_RESOLVED: 'ALREADY_RESOLVED',
 } as const;
+
+// ── Admin Edit Decision ──────────────────────────────────
+export const AdminEditDecisionSchema = z.object({
+  action: z.enum(['approve', 'reject']),
+});
+
+// ── Review Reaction ──────────────────────────────────────
+export const ReviewReactionSchema = z.object({
+  type: z.enum(['helpful', 'unhelpful']),
+});
+
+// ── Review Update ────────────────────────────────────────
+export const ReviewUpdateSchema = z.object({
+  body: z.string().min(20).max(500),
+});
 
 // ── Search ─────────────────────────────────────────────────
 export const BusinessSearchSchema = z.object({

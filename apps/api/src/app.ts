@@ -28,7 +28,7 @@ export async function buildApp() {
           ? { target: 'pino-pretty', options: { colorize: true } }
           : undefined,
     },
-    bodyLimit: 20 * 1024 * 1024, // 20MB — accommodates two base64-encoded NID images
+    bodyLimit: 5 * 1024 * 1024, // 5MB
   });
 
   // ── Security & CORS ────────────────────────────────────

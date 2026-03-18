@@ -37,11 +37,11 @@ export function ReviewForm({
       return;
     }
 
-    if (!user?.emailVerifiedAt || user?.nidStatus !== 'approved') {
+    if (!user?.phone || !user?.emailVerifiedAt) {
       setError(
         locale === 'bn'
-          ? 'রিভিউ জমা দিতে ইমেইল ও জাতীয় পরিচয়পত্র (NID) যাচাই করুন'
-          : 'Please verify your email and National ID before submitting a review',
+          ? 'রিভিউ জমা দিতে ফোন নম্বর ও ইমেইল যাচাই করুন'
+          : 'Please verify your phone and email before submitting a review',
       );
       router.push(`/${locale}/profile`);
       return;

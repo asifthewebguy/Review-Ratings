@@ -8,6 +8,9 @@ import type {
   ReviewSubmitSchema,
   ReviewEditSchema,
   ReviewFlagReasonSchema,
+  ReviewReactionSchema,
+  ReviewUpdateSchema,
+  AdminEditDecisionSchema,
   BusinessCreateSchema,
   BusinessUpdateSchema,
   BusinessSearchSchema,
@@ -18,10 +21,6 @@ import type {
   ErrorCodeSchema,
   EmailVerifyRequestSchema,
   EmailVerifyConfirmSchema,
-  NidSubmitSchema,
-  NidUploadUrlSchema,
-  AdminNidDecisionSchema,
-  NidStatusSchema,
 } from '../schemas/index.js';
 
 // ── Inferred Types ─────────────────────────────────────────
@@ -43,10 +42,9 @@ export type PaginationParams = z.infer<typeof PaginationParamsSchema>;
 export type ErrorCodeValue = z.infer<typeof ErrorCodeSchema>;
 export type EmailVerifyRequest = z.infer<typeof EmailVerifyRequestSchema>;
 export type EmailVerifyConfirm = z.infer<typeof EmailVerifyConfirmSchema>;
-export type NidSubmit = z.infer<typeof NidSubmitSchema>;
-export type NidUploadUrl = z.infer<typeof NidUploadUrlSchema>;
-export type AdminNidDecision = z.infer<typeof AdminNidDecisionSchema>;
-export type NidStatus = z.infer<typeof NidStatusSchema>;
+export type ReviewReaction = z.infer<typeof ReviewReactionSchema>;
+export type ReviewUpdateBody = z.infer<typeof ReviewUpdateSchema>;
+export type AdminEditDecision = z.infer<typeof AdminEditDecisionSchema>;
 
 // ── API Response Types ─────────────────────────────────────
 export interface ApiResponse<T = unknown> {
