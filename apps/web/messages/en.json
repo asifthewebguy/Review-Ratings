@@ -200,6 +200,27 @@
     "noReviews": "You haven't written any reviews yet",
     "browseBusinesses": "Browse businesses to review"
   },
+  "products": {
+    "title": "Products",
+    "addProduct": "Add Product",
+    "noProducts": "No products listed yet",
+    "noProductsHint": "Be the first to add a product for this business",
+    "writeReview": "Write a Review",
+    "reviews": "reviews",
+    "productName": "Product Name",
+    "productNameBn": "Product Name (Bangla, optional)",
+    "productDescription": "Description (optional)",
+    "productImage": "Image URL (optional)",
+    "productImagePlaceholder": "https://example.com/image.jpg",
+    "submitting": "Submitting...",
+    "submitProduct": "Add Product",
+    "added": "Product added!",
+    "reviewTitle": "Review this Product",
+    "reviewSuccess": "Review submitted!",
+    "alreadyReviewed": "You've already reviewed this product",
+    "loginRequired": "Login to add a product or write a review",
+    "cancel": "Cancel"
+  },
   "admin": {
     "title": "Admin Panel",
     "flags": "Flag Queue",

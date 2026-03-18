@@ -190,6 +190,15 @@ export const ReviewUpdateSchema = z.object({
   body: z.string().min(20).max(500),
 });
 
+// ── Product ───────────────────────────────────────────────
+export const CreateProductSchema = z.object({
+  businessId: z.string().uuid(),
+  name: z.string().min(2).max(200),
+  nameBn: z.string().min(2).max(200).optional(),
+  description: z.string().max(500).optional(),
+  imageUrl: z.string().url().optional(),
+});
+
 // ── Search ─────────────────────────────────────────────────
 export const BusinessSearchSchema = z.object({
   q: z.string().optional(),

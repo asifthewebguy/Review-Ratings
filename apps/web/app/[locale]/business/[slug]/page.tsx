@@ -4,6 +4,7 @@ import { ReviewCard } from '@/components/review-card';
 import { ReviewFormWrapper } from '@/components/review-form-wrapper';
 import { StarRating, RatingBadge } from '@/components/ui/star-rating';
 import { ClaimButton } from '@/components/claim-button';
+import { ProductsSection } from '@/components/products-section';
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}/api/v1`;
 
@@ -15,6 +16,17 @@ async function getBusiness(slug: string) {
     return data.data;
   } catch {
     return null;
+  }
+}
+
+async function getProducts(businessId: string) {
+  try {
+    const res = await fetch(`${API_URL}/businesses/${businessId}/products?limit=50`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data?.items ?? [];
+  } catch {
+    return [];
   }
 }
 
@@ -72,7 +84,10 @@ export default async function BusinessPage({
   const business = await getBusiness(slug);
   if (!business) notFound();
 
-  const { reviews, total } = await getReviews(business.id, page);
+  const [{ reviews, total }, products] = await Promise.all([
+    getReviews(business.id, page),
+    getProducts(business.id),
+  ]);
 
   const isBn = locale === 'bn';
   const categoryName = isBn ? business.category?.nameBn : business.category?.nameEn;
@@ -194,8 +209,13 @@ export default async function BusinessPage({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Reviews column */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* Reviews + Products column */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Products section */}
+          <ProductsSection businessId={business.id} initialProducts={products} locale={locale} />
+
+          {/* Reviews section */}
+          <div className="space-y-4">
           <h2 className="text-xl font-bold">
             {t('reviews')} ({total.toLocaleString(isBn ? 'bn-BD' : 'en-US')})
           </h2>
@@ -230,6 +250,7 @@ export default async function BusinessPage({
               ))}
             </div>
           )}
+          </div>
         </div>
 
         {/* Sidebar */}

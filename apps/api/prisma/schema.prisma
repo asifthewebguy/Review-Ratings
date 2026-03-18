@@ -34,6 +34,7 @@ model User {
   reviewedClaims    Claim[]        @relation("ClaimReviewer")
   reviewedEdits     ReviewEdit[]   @relation("EditReviewer")
   reviewReactions   ReviewReaction[]
+  createdProducts   Product[]      @relation("ProductCreatedBy")
 
   @@map("users")
 }
@@ -157,12 +158,38 @@ model Business {
   responses    Response[]
   claims       Claim[]
   subscription Subscription?
+  products     Product[]
 
   @@index([categoryId], map: "idx_businesses_category")
   @@index([districtId], map: "idx_businesses_district")
   @@index([slug], map: "idx_businesses_slug")
   @@index([trustScore(sort: Desc)], map: "idx_businesses_trust_score")
   @@map("businesses")
+}
+
+// ──────────────────────────────────────────────────────────
+// PRODUCTS
+// ──────────────────────────────────────────────────────────
+model Product {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessId  String   @map("business_id") @db.Uuid
+  createdById String   @map("created_by_id") @db.Uuid
+  name        String   @db.VarChar(200)
+  nameBn      String?  @map("name_bn") @db.VarChar(200)
+  description String?
+  imageUrl    String?  @map("image_url")
+  avgRating   Decimal? @map("avg_rating") @db.Decimal(3, 2)
+  reviewCount Int      @default(0) @map("review_count")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  business  Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdBy User     @relation("ProductCreatedBy", fields: [createdById], references: [id])
+  reviews   Review[]
+
+  @@index([businessId, isActive], map: "idx_products_business")
+  @@map("products")
 }
 
 // ──────────────────────────────────────────────────────────
@@ -183,6 +210,7 @@ model Review {
   flagCount         Int       @default(0) @map("flag_count")
   helpfulCount      Int       @default(0) @map("helpful_count")
   unhelpfulCount    Int       @default(0) @map("unhelpful_count")
+  productId         String?   @map("product_id") @db.Uuid
   ipAddress         String?   @map("ip_address") @db.VarChar(45) // IPv4/IPv6
   editedAt          DateTime? @map("edited_at") @db.Timestamptz()
   editLockedAt      DateTime? @map("edit_locked_at") @db.Timestamptz() // 48h after creation
@@ -193,14 +221,16 @@ model Review {
 
   business  Business         @relation(fields: [businessId], references: [id])
   user      User             @relation(fields: [userId], references: [id])
+  product   Product?         @relation(fields: [productId], references: [id], onDelete: SetNull)
   response  Response?
   flags     Flag[]
   edits     ReviewEdit[]
   reactions ReviewReaction[]
   updates   ReviewUpdate[]
 
-  @@unique([businessId, userId])
+  @@unique([productId, userId])
   @@index([businessId, status, createdAt(sort: Desc)], map: "idx_reviews_business")
+  @@index([productId, status, createdAt(sort: Desc)], map: "idx_reviews_product")
   @@index([userId], map: "idx_reviews_user")
   @@index([status], map: "idx_reviews_status")
   @@map("reviews")

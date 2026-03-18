@@ -21,6 +21,7 @@ import type {
   ErrorCodeSchema,
   EmailVerifyRequestSchema,
   EmailVerifyConfirmSchema,
+  CreateProductSchema,
 } from '../schemas/index.js';
 
 // ── Inferred Types ─────────────────────────────────────────
@@ -45,6 +46,7 @@ export type EmailVerifyConfirm = z.infer<typeof EmailVerifyConfirmSchema>;
 export type ReviewReaction = z.infer<typeof ReviewReactionSchema>;
 export type ReviewUpdateBody = z.infer<typeof ReviewUpdateSchema>;
 export type AdminEditDecision = z.infer<typeof AdminEditDecisionSchema>;
+export type CreateProduct = z.infer<typeof CreateProductSchema>;
 
 // ── API Response Types ─────────────────────────────────────
 export interface ApiResponse<T = unknown> {
@@ -98,6 +100,19 @@ export interface ReviewWithResponse {
     createdAt: string;
     isEdited: boolean;
   } | null;
+}
+
+// ── Product Display ────────────────────────────────────────
+export interface ProductProfile {
+  id: string;
+  businessId: string;
+  name: string;
+  nameBn: string | null;
+  description: string | null;
+  imageUrl: string | null;
+  avgRating: number | null;
+  reviewCount: number;
+  createdAt: string;
 }
 
 // ── Business Display ───────────────────────────────────────

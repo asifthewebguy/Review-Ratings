@@ -200,6 +200,27 @@
     "noReviews": "আপনি এখনো কোনো রিভিউ লেখেননি",
     "browseBusinesses": "রিভিউ দিতে ব্যবসা খুঁজুন"
   },
+  "products": {
+    "title": "পণ্য",
+    "addProduct": "পণ্য যোগ করুন",
+    "noProducts": "এখনো কোনো পণ্য যোগ করা হয়নি",
+    "noProductsHint": "এই ব্যবসার প্রথম পণ্যটি যোগ করুন",
+    "writeReview": "রিভিউ লিখুন",
+    "reviews": "রিভিউ",
+    "productName": "পণ্যের নাম",
+    "productNameBn": "পণ্যের নাম (বাংলা, ঐচ্ছিক)",
+    "productDescription": "বিবরণ (ঐচ্ছিক)",
+    "productImage": "ছবির URL (ঐচ্ছিক)",
+    "productImagePlaceholder": "https://example.com/image.jpg",
+    "submitting": "জমা হচ্ছে...",
+    "submitProduct": "পণ্য যোগ করুন",
+    "added": "পণ্য যোগ হয়েছে!",
+    "reviewTitle": "এই পণ্যে রিভিউ দিন",
+    "reviewSuccess": "রিভিউ জমা হয়েছে!",
+    "alreadyReviewed": "আপনি ইতিমধ্যে এই পণ্যে রিভিউ দিয়েছেন",
+    "loginRequired": "পণ্য যোগ বা রিভিউ দিতে লগইন করুন",
+    "cancel": "বাতিল"
+  },
   "admin": {
     "title": "অ্যাডমিন প্যানেল",
     "flags": "ফ্ল্যাগ কিউ",

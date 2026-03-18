@@ -189,6 +189,27 @@ export async function businessRoutes(app: FastifyInstance) {
     return reply.send({ success: true, data: updated });
   });
 
+  // GET /businesses/:id/products — list active products for a business
+  app.get('/:id/products', async (request, reply) => {
+    const { id: businessId } = request.params as { id: string };
+    const query = request.query as any;
+    const page = parseInt(query.page ?? '1', 10);
+    const limit = Math.min(parseInt(query.limit ?? '20', 10), 50);
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+      app.prisma.product.findMany({
+        where: { businessId, isActive: true },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      app.prisma.product.count({ where: { businessId, isActive: true } }),
+    ]);
+
+    return reply.send({ success: true, data: { items: products, total, page } });
+  });
+
   // GET /businesses/:id/reviews — paginated reviews for a business
   app.get('/:id/reviews', async (request, reply) => {
     const { id } = request.params as { id: string };
