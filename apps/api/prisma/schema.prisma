@@ -168,6 +168,23 @@ model Business {
 }
 
 // ──────────────────────────────────────────────────────────
+// PRODUCT CATEGORIES
+// ──────────────────────────────────────────────────────────
+model ProductCategory {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nameEn    String  @map("name_en") @db.VarChar(100)
+  nameBn    String  @map("name_bn") @db.VarChar(100)
+  slug      String  @unique @db.VarChar(100)
+  icon      String? @db.VarChar(10)
+  sortOrder Int     @default(0) @map("sort_order")
+  isActive  Boolean @default(true) @map("is_active")
+
+  products Product[]
+
+  @@map("product_categories")
+}
+
+// ──────────────────────────────────────────────────────────
 // PRODUCTS
 // ──────────────────────────────────────────────────────────
 model Product {
@@ -178,17 +195,22 @@ model Product {
   nameBn      String?  @map("name_bn") @db.VarChar(200)
   description String?
   imageUrl    String?  @map("image_url")
+  slug        String   @unique @db.VarChar(220)
+  categoryId  String?  @map("category_id") @db.Uuid
+  tags        String[] @default([])
   avgRating   Decimal? @map("avg_rating") @db.Decimal(3, 2)
   reviewCount Int      @default(0) @map("review_count")
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  business  Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  createdBy User     @relation("ProductCreatedBy", fields: [createdById], references: [id])
+  business  Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdBy User             @relation("ProductCreatedBy", fields: [createdById], references: [id])
+  category  ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   reviews   Review[]
 
   @@index([businessId, isActive], map: "idx_products_business")
+  @@index([slug], map: "idx_products_slug")
   @@map("products")
 }
 

@@ -197,6 +197,9 @@ export const CreateProductSchema = z.object({
   nameBn: z.string().min(2).max(200).optional(),
   description: z.string().max(500).optional(),
   imageUrl: z.string().url().optional(),
+  slug: z.string().min(2).max(220).optional(),
+  categoryId: z.string().uuid().optional(),
+  tags: z.array(z.string().max(50)).max(10).optional(),
 });
 
 // ── Search ─────────────────────────────────────────────────

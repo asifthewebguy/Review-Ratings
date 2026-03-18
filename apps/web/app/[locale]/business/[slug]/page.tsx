@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
+import Link from 'next/link';
 import { ReviewCard } from '@/components/review-card';
 import { ReviewFormWrapper } from '@/components/review-form-wrapper';
 import { StarRating, RatingBadge } from '@/components/ui/star-rating';
 import { ClaimButton } from '@/components/claim-button';
-import { ProductsSection } from '@/components/products-section';
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}/api/v1`;
 
@@ -16,17 +16,6 @@ async function getBusiness(slug: string) {
     return data.data;
   } catch {
     return null;
-  }
-}
-
-async function getProducts(businessId: string) {
-  try {
-    const res = await fetch(`${API_URL}/businesses/${businessId}/products?limit=50`, { cache: 'no-store' });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.data?.items ?? [];
-  } catch {
-    return [];
   }
 }
 
@@ -84,10 +73,8 @@ export default async function BusinessPage({
   const business = await getBusiness(slug);
   if (!business) notFound();
 
-  const [{ reviews, total }, products] = await Promise.all([
-    getReviews(business.id, page),
-    getProducts(business.id),
-  ]);
+  const { reviews, total } = await getReviews(business.id, page);
+  const productCount: number = business._count?.products ?? 0;
 
   const isBn = locale === 'bn';
   const categoryName = isBn ? business.category?.nameBn : business.category?.nameEn;
@@ -209,10 +196,19 @@ export default async function BusinessPage({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Reviews + Products column */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Products section */}
-          <ProductsSection businessId={business.id} initialProducts={products} locale={locale} />
+          {/* Products link */}
+          {productCount > 0 && (
+            <Link
+              href={`/${locale}/business/${slug}/products`}
+              className="flex items-center justify-between rounded-xl border bg-background px-5 py-4 hover:border-primary transition-colors"
+            >
+              <span className="flex items-center gap-2 font-medium">
+                📦 {productCount} {isBn ? 'টি পণ্য' : productCount === 1 ? 'Product' : 'Products'}
+              </span>
+              <span className="text-sm text-primary">{isBn ? 'সব পণ্য দেখুন →' : 'View all products →'}</span>
+            </Link>
+          )}
 
           {/* Reviews section */}
           <div className="space-y-4">

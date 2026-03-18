@@ -12,18 +12,23 @@ interface Product {
   nameBn: string | null;
   description: string | null;
   imageUrl: string | null;
+  slug: string;
   avgRating: number | null;
   reviewCount: number;
+  category?: { nameEn: string; nameBn: string; icon: string | null } | null;
+  tags?: string[];
 }
 
-interface ProductsSectionProps {
+interface ProductsClientProps {
   businessId: string;
+  businessSlug: string;
   initialProducts: Product[];
   locale: string;
 }
 
-export function ProductsSection({ businessId, initialProducts, locale }: ProductsSectionProps) {
+export function ProductsClient({ businessId, businessSlug, initialProducts, locale }: ProductsClientProps) {
   const t = useTranslations('products');
+  const isBn = locale === 'bn';
   const { isAuthenticated } = useAuthStore();
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -36,7 +41,9 @@ export function ProductsSection({ businessId, initialProducts, locale }: Product
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">{t('title')} ({products.length})</h2>
+        <p className="text-sm text-muted-foreground">
+          {products.length} {isBn ? 'টি পণ্য' : products.length === 1 ? 'product' : 'products'}
+        </p>
         {isAuthenticated && (
           <button
             onClick={() => setShowAddForm(true)}
@@ -48,7 +55,7 @@ export function ProductsSection({ businessId, initialProducts, locale }: Product
       </div>
 
       {products.length === 0 ? (
-        <div className="rounded-xl border bg-background p-8 text-center text-muted-foreground">
+        <div className="rounded-xl border bg-background p-12 text-center text-muted-foreground">
           <p className="text-4xl mb-3">📦</p>
           <p className="font-medium">{t('noProducts')}</p>
           <p className="text-sm mt-1">{t('noProductsHint')}</p>

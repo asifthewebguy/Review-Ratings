@@ -102,6 +102,16 @@ export interface ReviewWithResponse {
   } | null;
 }
 
+// ── Product Category ───────────────────────────────────────
+export interface ProductCategory {
+  id: string;
+  nameEn: string;
+  nameBn: string;
+  slug: string;
+  icon: string | null;
+  sortOrder: number;
+}
+
 // ── Product Display ────────────────────────────────────────
 export interface ProductProfile {
   id: string;
@@ -110,9 +120,14 @@ export interface ProductProfile {
   nameBn: string | null;
   description: string | null;
   imageUrl: string | null;
+  slug: string;
+  categoryId: string | null;
+  category: ProductCategory | null;
+  tags: string[];
   avgRating: number | null;
   reviewCount: number;
   createdAt: string;
+  business?: { id: string; name: string; slug: string };
 }
 
 // ── Business Display ───────────────────────────────────────

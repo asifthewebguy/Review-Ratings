@@ -1,8 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/store';
+
+interface Category {
+  id: string;
+  nameEn: string;
+  nameBn: string;
+  slug: string;
+  icon: string | null;
+}
 
 interface AddProductFormProps {
   businessId: string;
@@ -13,6 +21,16 @@ interface AddProductFormProps {
 
 const API_URL = '/api/v1';
 
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 200);
+}
+
 export function AddProductForm({ businessId, locale, onSuccess, onCancel }: AddProductFormProps) {
   const t = useTranslations('products');
   const isBn = locale === 'bn';
@@ -22,8 +40,22 @@ export function AddProductForm({ businessId, locale, onSuccess, onCancel }: AddP
   const [nameBn, setNameBn] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [tagsInput, setTagsInput] = useState('');
+  const [slugOverride, setSlugOverride] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch(`${API_URL}/products/product-categories`)
+      .then((r) => r.json())
+      .then((d) => setCategories(d.data ?? []))
+      .catch(() => {});
+  }, []);
+
+  const autoSlug = generateSlug(name);
+  const effectiveSlug = slugOverride || autoSlug;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,6 +66,12 @@ export function AddProductForm({ businessId, locale, onSuccess, onCancel }: AddP
     setSubmitting(true);
     setError('');
     try {
+      const tags = tagsInput
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean)
+        .slice(0, 10);
+
       const res = await fetch(`${API_URL}/products`, {
         method: 'POST',
         headers: {
@@ -46,6 +84,9 @@ export function AddProductForm({ businessId, locale, onSuccess, onCancel }: AddP
           nameBn: nameBn || undefined,
           description: description || undefined,
           imageUrl: imageUrl || undefined,
+          slug: slugOverride || undefined,
+          categoryId: categoryId || undefined,
+          tags: tags.length ? tags : undefined,
         }),
       });
       const data = await res.json();
@@ -64,7 +105,7 @@ export function AddProductForm({ businessId, locale, onSuccess, onCancel }: AddP
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onCancel}>
       <div
-        className="bg-background rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4"
+        className="bg-background rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -97,6 +138,22 @@ export function AddProductForm({ businessId, locale, onSuccess, onCancel }: AddP
           </div>
 
           <div className="space-y-1">
+            <label className="text-sm font-medium">{t('category')}</label>
+            <select
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+            >
+              <option value="">{t('selectCategory')}</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.icon} {isBn ? c.nameBn : c.nameEn}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1">
             <label className="text-sm font-medium">{t('productDescription')}</label>
             <textarea
               value={description}
@@ -117,6 +174,32 @@ export function AddProductForm({ businessId, locale, onSuccess, onCancel }: AddP
               className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium">{t('tags')}</label>
+            <input
+              type="text"
+              value={tagsInput}
+              onChange={(e) => setTagsInput(e.target.value)}
+              placeholder={t('tagsPlaceholder')}
+              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          {name.length >= 2 && (
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-muted-foreground">{t('slugPreview')}</label>
+              <div className="flex gap-2 items-center">
+                <span className="text-xs text-muted-foreground">/product/</span>
+                <input
+                  type="text"
+                  value={slugOverride || autoSlug}
+                  onChange={(e) => setSlugOverride(e.target.value)}
+                  className="flex-1 rounded-lg border px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary font-mono"
+                />
+              </div>
+            </div>
+          )}
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 

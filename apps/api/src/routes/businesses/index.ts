@@ -111,7 +111,7 @@ export async function businessRoutes(app: FastifyInstance) {
           category: { include: { subRatings: true } },
           district: { include: { division: true } },
           upazila: true,
-          _count: { select: { reviews: { where: { status: 'published' } } } },
+          _count: { select: { reviews: { where: { status: 'published' } }, products: { where: { isActive: true } } } },
         },
       }),
     );
@@ -200,6 +200,12 @@ export async function businessRoutes(app: FastifyInstance) {
     const [products, total] = await Promise.all([
       app.prisma.product.findMany({
         where: { businessId, isActive: true },
+        select: {
+          id: true, name: true, nameBn: true, description: true,
+          imageUrl: true, slug: true, categoryId: true, tags: true,
+          avgRating: true, reviewCount: true, createdAt: true,
+          category: { select: { id: true, nameEn: true, nameBn: true, slug: true, icon: true } },
+        },
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
@@ -220,7 +226,7 @@ export async function businessRoutes(app: FastifyInstance) {
 
     const [reviews, total] = await Promise.all([
       app.prisma.review.findMany({
-        where: { businessId: id, status: 'published' },
+        where: { businessId: id, status: 'published', productId: null },
         include: {
           user: {
             select: { id: true, displayName: true, avatarUrl: true, trustLevel: true },
@@ -234,7 +240,7 @@ export async function businessRoutes(app: FastifyInstance) {
         skip,
         take: limit,
       }),
-      app.prisma.review.count({ where: { businessId: id, status: 'published' } }),
+      app.prisma.review.count({ where: { businessId: id, status: 'published', productId: null } }),
     ]);
 
     return reply.send({ success: true, data: reviews, meta: { total, page, limit } });
