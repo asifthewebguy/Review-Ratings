@@ -8,7 +8,7 @@ import { useAuthStore } from '@/lib/store';
 interface ProductReviewFormProps {
   productId: string;
   locale: string;
-  onSuccess: () => void;
+  onSuccess: (rating: number, body: string) => void;
   onCancel: () => void;
 }
 
@@ -45,7 +45,7 @@ export function ProductReviewForm({ productId, locale, onSuccess, onCancel }: Pr
         setError(data.error?.message ?? (isBn ? 'ত্রুটি হয়েছে' : 'An error occurred'));
         return;
       }
-      onSuccess();
+      onSuccess(rating, body);
     } catch {
       setError(isBn ? 'সংযোগ ত্রুটি' : 'Connection error');
     } finally {
@@ -54,6 +54,7 @@ export function ProductReviewForm({ productId, locale, onSuccess, onCancel }: Pr
   }
 
   return (
+
     <form onSubmit={handleSubmit} className="space-y-3 mt-3 border-t pt-3">
       <p className="text-sm font-medium">{t('reviewTitle')}</p>
       <div>
