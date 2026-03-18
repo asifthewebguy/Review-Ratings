@@ -180,6 +180,26 @@
     "alreadyClaimed": "This business is already claimed",
     "loginRequired": "Please login to claim this business"
   },
+  "profile": {
+    "title": "My Profile",
+    "account": "Account",
+    "verification": "Verification",
+    "myReviews": "My Reviews",
+    "displayName": "Display Name",
+    "avatarUrl": "Avatar URL",
+    "avatarUrlPlaceholder": "https://example.com/avatar.jpg",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Saved!",
+    "memberSince": "Member since",
+    "trustLevel": "Trust Level",
+    "phoneVerified": "Phone Verified",
+    "emailVerified": "Email Verified",
+    "notVerified": "Not verified",
+    "goVerify": "Verify now",
+    "noReviews": "You haven't written any reviews yet",
+    "browseBusinesses": "Browse businesses to review"
+  },
   "admin": {
     "title": "Admin Panel",
     "flags": "Flag Queue",

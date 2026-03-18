@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { StarRating } from '@/components/ui/star-rating';
 import { useAuthStore } from '@/lib/store';
 import { useTranslations } from 'next-intl';
 import { formatDistanceToNow } from 'date-fns';
+import { ReviewEditForm } from '@/components/review-edit-form';
 
 const API_URL = '/api/v1';
 
@@ -32,16 +34,17 @@ interface ReviewCardProps {
     edits?: { id: string }[];
   };
   locale: string;
-  onEdit?: () => void;
   onUpdate?: () => void;
 }
 
-export function ReviewCard({ review, locale, onEdit, onUpdate }: ReviewCardProps) {
+export function ReviewCard({ review, locale, onUpdate }: ReviewCardProps) {
   const isBn = locale === 'bn';
   const t = useTranslations('review');
+  const router = useRouter();
   const { user: currentUser, tokens, isAuthenticated } = useAuthStore();
   const timeAgo = formatDistanceToNow(new Date(review.createdAt), { addSuffix: true });
 
+  const [showEditForm, setShowEditForm] = useState(false);
   const [showOriginal, setShowOriginal] = useState(false);
   const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount ?? 0);
   const [unhelpfulCount, setUnhelpfulCount] = useState(review.unhelpfulCount ?? 0);
@@ -250,9 +253,9 @@ export function ReviewCard({ review, locale, onEdit, onUpdate }: ReviewCardProps
         {/* Author actions */}
         {isAuthor && (
           <div className="ml-auto flex gap-2">
-            {!hasPendingEdit && (
+            {!hasPendingEdit && !showEditForm && (
               <button
-                onClick={onEdit}
+                onClick={() => setShowEditForm(true)}
                 className="text-xs text-primary hover:underline"
               >
                 {isBn ? 'সম্পাদনা' : 'Edit'}
@@ -321,6 +324,21 @@ export function ReviewCard({ review, locale, onEdit, onUpdate }: ReviewCardProps
             {review.response.user.displayName}
           </p>
           <p className="text-sm">{review.response.body}</p>
+        </div>
+      )}
+
+      {/* Inline Edit Form */}
+      {showEditForm && (
+        <div className="mt-4">
+          <ReviewEditForm
+            review={{ id: review.id, rating: review.rating, body: review.body }}
+            locale={locale}
+            onCancel={() => setShowEditForm(false)}
+            onSuccess={() => {
+              setShowEditForm(false);
+              router.refresh();
+            }}
+          />
         </div>
       )}
     </div>

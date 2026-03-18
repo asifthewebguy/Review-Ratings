@@ -22,7 +22,7 @@ async function getReviews(businessId: string, page = 1) {
   try {
     const res = await fetch(
       `${API_URL}/businesses/${businessId}/reviews?page=${page}&limit=10`,
-      { next: { revalidate: 60 } },
+      { cache: 'no-store' },
     );
     if (!res.ok) return { reviews: [], total: 0 };
     const data = await res.json();

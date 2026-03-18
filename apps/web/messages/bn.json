@@ -180,6 +180,26 @@
     "alreadyClaimed": "এই ব্যবসা ইতিমধ্যে দাবি করা হয়েছে",
     "loginRequired": "দাবি করতে লগইন করুন"
   },
+  "profile": {
+    "title": "আমার প্রোফাইল",
+    "account": "অ্যাকাউন্ট",
+    "verification": "যাচাইকরণ",
+    "myReviews": "আমার রিভিউ",
+    "displayName": "প্রদর্শন নাম",
+    "avatarUrl": "অবতার URL",
+    "avatarUrlPlaceholder": "https://example.com/avatar.jpg",
+    "saveChanges": "পরিবর্তন সংরক্ষণ করুন",
+    "saving": "সংরক্ষণ হচ্ছে...",
+    "saved": "সংরক্ষিত!",
+    "memberSince": "সদস্য হয়েছেন",
+    "trustLevel": "বিশ্বাস স্তর",
+    "phoneVerified": "ফোন যাচাই হয়েছে",
+    "emailVerified": "ইমেইল যাচাই হয়েছে",
+    "notVerified": "যাচাই হয়নি",
+    "goVerify": "এখনই যাচাই করুন",
+    "noReviews": "আপনি এখনো কোনো রিভিউ লেখেননি",
+    "browseBusinesses": "রিভিউ দিতে ব্যবসা খুঁজুন"
+  },
   "admin": {
     "title": "অ্যাডমিন প্যানেল",
     "flags": "ফ্ল্যাগ কিউ",
