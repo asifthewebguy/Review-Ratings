@@ -19,6 +19,7 @@ export function ProfileClient({ locale }: ProfileClientProps) {
   const { isAuthenticated, tokens, user, updateUser, refreshAccessToken } = useAuthStore();
   const router = useRouter();
 
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<'account' | 'verification' | 'reviews'>('account');
 
   // Edit form state
@@ -34,10 +35,15 @@ export function ProfileClient({ locale }: ProfileClientProps) {
   const [reviewsLoading, setReviewsLoading] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     if (!isAuthenticated) {
       router.replace('/');
     }
-  }, [isAuthenticated, router]);
+  }, [mounted, isAuthenticated, router]);
 
   useEffect(() => {
     if (user) {
@@ -114,6 +120,11 @@ export function ProfileClient({ locale }: ProfileClientProps) {
     fetchReviews(newPage);
   }
 
+  if (!mounted) return (
+    <div className="mx-auto max-w-2xl px-4 py-8 text-center text-muted-foreground">
+      {locale === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}
+    </div>
+  );
   if (!isAuthenticated || !user) return null;
 
   // Avatar: image or initials

@@ -69,6 +69,13 @@ export function Header({ locale }: HeaderProps) {
                       >
                         {t('dashboard')}
                       </Link>
+                      <Link
+                        href="/profile"
+                        onClick={() => setShowUserMenu(false)}
+                        className="block px-4 py-2 text-sm hover:bg-muted"
+                      >
+                        {locale === 'bn' ? 'আমার প্রোফাইল' : 'My Profile'}
+                      </Link>
                       {(user?.role === 'admin' || user?.role === 'moderator') && (
                         <Link
                           href="/admin"
