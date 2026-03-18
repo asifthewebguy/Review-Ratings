@@ -17,7 +17,7 @@ const API_URL = '/api/v1';
 export function ClaimModal({ businessId, businessName, locale, onClose, onSuccess }: ClaimModalProps) {
   const t = useTranslations('claim');
   const { tokens } = useAuthStore();
-  const [docType, setDocType] = useState<'trade_license' | 'nid'>('trade_license');
+  const [docType] = useState<'trade_license'>('trade_license');
   const [docUrl, setDocUrl] = useState('');
   const [docUrlBack, setDocUrlBack] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -76,12 +76,9 @@ export function ClaimModal({ businessId, businessName, locale, onClose, onSucces
             <div>
               <label className="block text-sm font-medium mb-2">{t('docType')}</label>
               <div className="flex gap-3">
-                {(['trade_license', 'nid'] as const).map((type) => (
-                  <label key={type} className={`flex-1 border rounded-lg p-3 cursor-pointer text-sm text-center transition-colors ${docType === type ? 'border-primary bg-primary/5 text-primary font-medium' : 'hover:border-primary/50'}`}>
-                    <input type="radio" name="docType" value={type} checked={docType === type} onChange={() => setDocType(type)} className="sr-only" />
-                    {type === 'trade_license' ? t('tradeLicense') : t('nid')}
-                  </label>
-                ))}
+                <label className="flex-1 border rounded-lg p-3 text-sm text-center border-primary bg-primary/5 text-primary font-medium">
+                  {t('tradeLicense')}
+                </label>
               </div>
             </div>
 
