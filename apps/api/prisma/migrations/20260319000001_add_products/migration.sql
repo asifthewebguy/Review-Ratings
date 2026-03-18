@@ -19,9 +19,10 @@ CREATE TABLE "products" (
 -- AlterTable: add product_id to reviews
 ALTER TABLE "reviews" ADD COLUMN "product_id" UUID;
 
--- Drop old unique constraint (one review per business per user)
+-- Drop old unique index (one review per business per user)
+-- Prisma creates @@unique as an index, not a constraint — must use DROP INDEX
 -- Now enforced at app level for business reviews; product reviews use the new constraint below
-ALTER TABLE "reviews" DROP CONSTRAINT IF EXISTS "reviews_business_id_user_id_key";
+DROP INDEX IF EXISTS "reviews_business_id_user_id_key";
 
 -- CreateIndex
 CREATE INDEX "idx_products_business" ON "products"("business_id", "is_active");
