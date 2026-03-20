@@ -100,7 +100,7 @@
   },
   "search": {
     "title": "Search Results",
-    "placeholder": "Search businesses...",
+    "placeholder": "Search businesses and products...",
     "noResults": "No results found",
     "filters": "Filters",
     "sortBy": "Sort by",
@@ -111,7 +111,13 @@
     "category": "Category",
     "location": "Location",
     "allCategories": "All Categories",
-    "allLocations": "All Locations"
+    "allLocations": "All Locations",
+    "tabAll": "All",
+    "tabBusinesses": "Businesses",
+    "tabProducts": "Products",
+    "noProductResults": "No products found",
+    "productCategory": "Product Category",
+    "allProductCategories": "All Product Categories"
   },
   "review": {
     "title": "Write a Review",

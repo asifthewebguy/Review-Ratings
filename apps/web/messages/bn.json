@@ -100,7 +100,7 @@
   },
   "search": {
     "title": "অনুসন্ধান ফলাফল",
-    "placeholder": "ব্যবসা খুঁজুন...",
+    "placeholder": "ব্যবসা ও পণ্য খুঁজুন...",
     "noResults": "কোনো ফলাফল পাওয়া যায়নি",
     "filters": "ফিল্টার",
     "sortBy": "সাজানো",
@@ -111,7 +111,13 @@
     "category": "বিভাগ",
     "location": "অবস্থান",
     "allCategories": "সব বিভাগ",
-    "allLocations": "সব অবস্থান"
+    "allLocations": "সব অবস্থান",
+    "tabAll": "সব",
+    "tabBusinesses": "ব্যবসা",
+    "tabProducts": "পণ্য",
+    "noProductResults": "কোনো পণ্য পাওয়া যায়নি",
+    "productCategory": "পণ্য বিভাগ",
+    "allProductCategories": "সব পণ্য বিভাগ"
   },
   "review": {
     "title": "রিভিউ লিখুন",

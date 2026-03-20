@@ -287,7 +287,32 @@ async function main() {
   }
   console.log(`  ✓ ${categoriesData.length} categories, ${subRatingCount} sub-rating definitions`);
 
-  // ── 5. Seed Admin Account ──────────────────────────────
+  // ── 5. Seed Product Categories ─────────────────────────
+  console.log('📦 Seeding product categories...');
+  const productCategories = [
+    { nameEn: 'Electronics', nameBn: 'ইলেকট্রনিক্স', slug: 'electronics', icon: '💻', sortOrder: 1 },
+    { nameEn: 'Clothing & Fashion', nameBn: 'পোশাক ও ফ্যাশন', slug: 'clothing-fashion', icon: '👗', sortOrder: 2 },
+    { nameEn: 'Food & Beverages', nameBn: 'খাবার ও পানীয়', slug: 'food-beverages', icon: '🍔', sortOrder: 3 },
+    { nameEn: 'Health & Beauty', nameBn: 'স্বাস্থ্য ও সৌন্দর্য', slug: 'health-beauty', icon: '💄', sortOrder: 4 },
+    { nameEn: 'Home & Furniture', nameBn: 'গৃহস্থালি ও আসবাব', slug: 'home-furniture', icon: '🛋️', sortOrder: 5 },
+    { nameEn: 'Books & Stationery', nameBn: 'বই ও স্টেশনারি', slug: 'books-stationery', icon: '📚', sortOrder: 6 },
+    { nameEn: 'Sports & Outdoors', nameBn: 'খেলাধুলা ও আউটডোর', slug: 'sports-outdoors', icon: '⚽', sortOrder: 7 },
+    { nameEn: 'Toys & Games', nameBn: 'খেলনা ও গেমস', slug: 'toys-games', icon: '🎮', sortOrder: 8 },
+    { nameEn: 'Automotive', nameBn: 'যানবাহন ও পার্টস', slug: 'automotive', icon: '🚗', sortOrder: 9 },
+    { nameEn: 'Groceries', nameBn: 'মুদিখানা', slug: 'groceries', icon: '🛒', sortOrder: 10 },
+    { nameEn: 'Medicines & Healthcare', nameBn: 'ওষুধ ও স্বাস্থ্যসেবা', slug: 'medicines-healthcare', icon: '💊', sortOrder: 11 },
+    { nameEn: 'Other', nameBn: 'অন্যান্য', slug: 'other', icon: '📦', sortOrder: 12 },
+  ];
+  for (const cat of productCategories) {
+    await prisma.productCategory.upsert({
+      where: { slug: cat.slug },
+      update: {},
+      create: { ...cat, isActive: true },
+    });
+  }
+  console.log(`  ✓ ${productCategories.length} product categories`);
+
+  // ── 6. Seed Admin Account ──────────────────────────────
   console.log('👤 Seeding admin account...');
   const adminPhone = process.env.ADMIN_PHONE ?? '+8801000000000';
   await prisma.user.upsert({

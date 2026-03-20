@@ -99,6 +99,43 @@ export async function productRoutes(app: FastifyInstance) {
     return reply.send({ success: true, data: categories });
   });
 
+  // GET /products — search/list products
+  app.get('/', async (request, reply) => {
+    const { q, category, page: pageStr = '1', limit: limitStr = '20' } = request.query as {
+      q?: string; category?: string; page?: string; limit?: string;
+    };
+    const page = Math.max(1, parseInt(pageStr, 10));
+    const limit = Math.min(50, Math.max(1, parseInt(limitStr, 10)));
+    const skip = (page - 1) * limit;
+
+    const where: any = { isActive: true };
+    if (category) {
+      const cat = await app.prisma.productCategory.findUnique({ where: { slug: category } });
+      if (cat) where.categoryId = cat.id;
+    }
+    if (q) {
+      where.OR = [
+        { name: { contains: q, mode: 'insensitive' } },
+        { nameBn: { contains: q, mode: 'insensitive' } },
+        { description: { contains: q, mode: 'insensitive' } },
+        { tags: { has: q } },
+      ];
+    }
+
+    const [items, total] = await Promise.all([
+      app.prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: [{ reviewCount: 'desc' }, { createdAt: 'desc' }],
+        select: productSelect,
+      }),
+      app.prisma.product.count({ where }),
+    ]);
+
+    return reply.send({ success: true, data: { items, total, page, limit } });
+  });
+
   // POST /products — create a product (any authenticated user)
   app.post('/', { preHandler: app.authenticate }, async (request, reply) => {
     const userId = request.user.sub;
