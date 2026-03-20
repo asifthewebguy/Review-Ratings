@@ -53,7 +53,10 @@
     "topRated": "শীর্ষ রেটিং প্রাপ্ত",
     "recentReviews": "সাম্প্রতিক রিভিউ",
     "browseCategories": "ক্যাটেগরি ব্রাউজ করুন",
-    "noBusinesses": "এখনো কোনো ব্যবসা নেই"
+    "browseProducts": "পণ্য ব্রাউজ করুন",
+    "viewAllProducts": "সব পণ্য দেখুন",
+    "noBusinesses": "এখনো কোনো ব্যবসা নেই",
+    "noProducts": "এখনো কোনো পণ্য নেই"
   },
   "business": {
     "addBusiness": "ব্যবসা যোগ করুন",

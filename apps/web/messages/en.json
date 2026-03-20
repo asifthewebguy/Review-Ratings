@@ -53,7 +53,10 @@
     "topRated": "Top Rated",
     "recentReviews": "Recent Reviews",
     "browseCategories": "Browse Categories",
-    "noBusinesses": "No businesses yet"
+    "browseProducts": "Browse Products",
+    "viewAllProducts": "View all products",
+    "noBusinesses": "No businesses yet",
+    "noProducts": "No products yet"
   },
   "business": {
     "addBusiness": "Add a Business",
