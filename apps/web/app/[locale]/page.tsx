@@ -121,7 +121,7 @@ export default async function HomePage({
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold">{t('browseProducts')}</h2>
-            <Link href={`/${locale}/search?tab=products`} className="text-sm text-primary hover:underline">
+            <Link href="/search?tab=products" className="text-sm text-primary hover:underline">
               {t('viewAllProducts')} →
             </Link>
           </div>
